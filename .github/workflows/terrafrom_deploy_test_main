@@ -1,0 +1,99 @@
+name: Terraform Deployment
+
+on:
+  push:
+    branches:
+      - main
+#ponizej mamy definicje zmiennych 
+env:
+  AWS_REGION: ${{ secrets.TF_REGION }} # TO JEST TO SAMO CO OSTATNIA ZMIENNA, RACZEJ DO WYRZUCENIA 
+  S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
+  TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
+  TF_BUCKET_KEY: ${{ secrets.TF_BUCKET_KEY }}
+  TF_DYNAMO_TABLE: ${{ secrets.TF_DYNAMO_TABLE }}
+  TF_REGION: ${{ secrets.TF_REGION }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install zip utility
+        run: sudo apt-get install zip -y
+# MUSZE SPRAWDZIC CZEMU DLA PAKOWANIA ZALEZNOSCI STAWIAMY SRODOWISKO WIRUTALNE, I WOGOLE CZY MOZNA TO ROBIC Z POZIOMU REPOZYTORIUM 
+      - name: Package Lambda authorizer_function
+        working-directory: src/authorizer
+        run: |
+          python -m venv test 
+          source test/bin/activate
+          pip install -r requirements.txt
+          zip -r ../../authorizer_function.zip lambda_function.py
+# TO SAMO CO WYZEJ 
+      - name: Package Lambda userfunction
+        working-directory: src/users
+        run: |
+          python -m venv test
+          source test/bin/activate
+          pip install -r requirements.txt
+          zip -r ../../userfunction.zip lambda_function.py
+
+      - name: Upload Lambda packages to S3
+        run: |
+          aws s3 cp authorizer_function.zip s3://$S3_BUCKET/
+          aws s3 cp userfunction.zip s3://$S3_BUCKET/
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Generate backend config
+        run: |
+          cat > backend.tf <<EOF
+          terraform {
+            backend "s3" {
+              bucket         = "${TF_BUCKET_NAME}"
+              key            = "${TF_BUCKET_KEY}"
+              region         = "${TF_REGION}"
+              dynamodb_table = "${TF_DYNAMO_TABLE}"
+              encrypt        = true
+            }
+          }
+          EOF
+
+      - name: Terraform Init
+        run: terraform init -backend-config=backend.tf
+        working-directory: ./users
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+        working-directory: ./users
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+        working-directory: ./users
+
+      - name: Set up test environment
+        run: |
+          python -m venv test
+          source test/bin/activate
+          pip install -r tests/requirements.txt
+        shell: bash
+
+      - name: Run Unit Tests
+        run: |
+          source test/bin/activate
+          pytest tests/unit
+        shell: bash
+
+      - name: Run Integration Tests
+        run: |
+          source test/bin/activate
+          pytest tests/integration
+        shell: bash

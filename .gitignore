@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+.env/
+.venv/
+venv/
+test/
+env/
+ENV/
+*.egg-info/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.cache
+pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+terraform.tfvars.json
+*.backup
+
+# AWS Lambda packages
+authorizer_function.zip
+userfunction.zip
+
+# IDEs / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
