@@ -68,7 +68,7 @@ module  "api-gateway"  {
     api_name  = "${var.stack_name}-api"
     auth_function_arn = module.lambda_authorizer.auth_function_arn
     lambda_auth_name = module.lambda_authorizer.lambda_auth_name
-    api_account_name= var.stack_name
+    api_account_name = var.stack_name
 }
 
 module "dynamodb" {
