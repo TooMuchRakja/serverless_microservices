@@ -5,13 +5,6 @@ on:
     branches:
       - main
 
-env:
-  S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
-  TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
-  TF_BUCKET_KEY: ${{ secrets.TF_BUCKET_KEY }}
-  TF_DYNAMO_TABLE: ${{ secrets.TF_DYNAMO_TABLE }}
-  TF_REGION: ${{ secrets.TF_REGION }}
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -28,7 +21,7 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ env.TF_REGION }}
+          aws-region: ${{ secrets.TF_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -38,20 +31,22 @@ jobs:
       - name: Package Lambda authorizer_function
         working-directory: src/authorizer
         run: |
-          python -m venv test 
-          source test/bin/activate
+          python -m venv venv
+          source venv/bin/activate
           pip install -r requirements.txt
-          zip -r ../../authorizer_function.zip lambda_function.py
+          zip ../../authorizer_function.zip lambda_function.py
 
       - name: Package Lambda userfunction
         working-directory: src/users
         run: |
-          python -m venv test
-          source test/bin/activate
+          python -m venv venv
+          source venv/bin/activate
           pip install -r requirements.txt
-          zip -r ../../userfunction.zip lambda_function.py
+          zip ../../userfunction.zip lambda_function.py
 
       - name: Upload Lambda packages to S3
+        env:
+          S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
         run: |
           aws s3 cp authorizer_function.zip s3://$S3_BUCKET/
           aws s3 cp userfunction.zip s3://$S3_BUCKET/
@@ -60,31 +55,32 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Generate backend config
+        env:
+          TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
+          TF_BUCKET_KEY: ${{ secrets.TF_BUCKET_KEY }}
+          TF_REGION: ${{ secrets.TF_REGION }}
+          TF_DYNAMO_TABLE: ${{ secrets.TF_DYNAMO_TABLE }}
         run: |
-          cat > backend.tf <<EOF
-          terraform {
-            backend "s3" {
-              bucket         = "${TF_BUCKET_NAME}"
-              key            = "${TF_BUCKET_KEY}"
-              region         = "${TF_REGION}"
-              dynamodb_table = "${TF_DYNAMO_TABLE}"
-              encrypt        = true
-            }
-          }
-          EOF
+          cat <<EOF > backend.conf.hcl
+bucket         = "${TF_BUCKET_NAME}"
+key            = "${TF_BUCKET_KEY}"
+region         = "${TF_REGION}"
+dynamodb_table = "${TF_DYNAMO_TABLE}"
+encrypt        = true
+EOF
 
       - name: Terraform Init
-        run: terraform init -backend-config=backend.tf
-        working-directory: .
+        run: terraform init -backend-config=backend.conf.hcl
+
+      - name: Terraform Validate
+        run: terraform validate
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: .
 
       - name: Terraform Apply
         id: apply
         run: terraform apply -auto-approve tfplan
-        working-directory: .
 
       - name: Wait for resources to establish connections
         run: sleep 30
@@ -121,7 +117,7 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ env.TF_REGION }}
+          aws-region: ${{ secrets.TF_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -129,28 +125,29 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Generate backend config
+        env:
+          TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
+          TF_BUCKET_KEY: ${{ secrets.TF_BUCKET_KEY }}
+          TF_REGION: ${{ secrets.TF_REGION }}
+          TF_DYNAMO_TABLE: ${{ secrets.TF_DYNAMO_TABLE }}
         run: |
-          cat > backend.tf <<EOF
-          terraform {
-            backend "s3" {
-              bucket         = "${TF_BUCKET_NAME}"
-              key            = "${TF_BUCKET_KEY}"
-              region         = "${TF_REGION}"
-              dynamodb_table = "${TF_DYNAMO_TABLE}"
-              encrypt        = true
-            }
-          }
-          EOF
+          cat <<EOF > backend.conf.hcl
+bucket         = "${TF_BUCKET_NAME}"
+key            = "${TF_BUCKET_KEY}"
+region         = "${TF_REGION}"
+dynamodb_table = "${TF_DYNAMO_TABLE}"
+encrypt        = true
+EOF
 
       - name: Terraform Init
-        run: terraform init -backend-config=backend.tf
-        working-directory: .
+        run: terraform init -backend-config=backend.conf.hcl
 
       - name: Rollback - Terraform Destroy
         run: terraform destroy -auto-approve
-        working-directory: .
 
       - name: Rollback - Delete Lambda ZIPs from S3
+        env:
+          S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
         run: |
           aws s3 rm s3://$S3_BUCKET/authorizer_function.zip || true
           aws s3 rm s3://$S3_BUCKET/userfunction.zip || true
