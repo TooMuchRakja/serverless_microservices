@@ -3,6 +3,13 @@ name: destroy
 on:
   workflow_dispatch:  # ręczne wywołanie
 
+env:
+  S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
+  TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
+  TF_BUCKET_KEY: ${{ secrets.TF_BUCKET_KEY }}
+  TF_DYNAMO_TABLE: ${{ secrets.TF_DYNAMO_TABLE }}
+  TF_REGION: ${{ secrets.TF_REGION }}
+
 jobs:
   destroy:
     runs-on: ubuntu-latest
