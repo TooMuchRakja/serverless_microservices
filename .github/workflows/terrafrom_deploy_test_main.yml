@@ -91,21 +91,21 @@ jobs:
         run: |
           python -m venv test
           source test/bin/activate
-          pip install -r tests/requirements.txt
+          pip install -r ./tests/requirements.txt
         shell: bash
 
       - name: Run Unit Tests
         id: unit_tests
         run: |
           source test/bin/activate
-          pytest tests/unit
+          PYTHONPATH=src python3 -m pytest tests/unit -v
         shell: bash
 
       - name: Run Integration Tests
         id: integration_tests
         run: |
           source test/bin/activate
-          pytest tests/integration
+          python3 -m pytest tests/integration -v
         shell: bash
 
   rollback:
