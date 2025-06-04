@@ -38,18 +38,26 @@ jobs:
       - name: Package Lambda authorizer_function
         working-directory: src/authorizer
         run: |
-          python -m venv test 
+          python -m venv test
           source test/bin/activate
           pip install -r requirements.txt
-          zip -r ../../authorizer_function.zip lambda_function.py
-
+          # Idziemy do folderu z zależnościami i pakujemy wszystko
+          cd test/lib/python3.*/site-packages
+          zip -r9 ../../../../authorizer_function.zip .
+          cd ../../../../
+          # Do zipa dopakowujemy kod funkcji
+          zip -g authorizer_function.zip lambda_function.py
+ 
       - name: Package Lambda userfunction
         working-directory: src/users
         run: |
           python -m venv test
           source test/bin/activate
           pip install -r requirements.txt
-          zip -r ../../userfunction.zip lambda_function.py
+          cd test/lib/python3.*/site-packages
+          zip -r9 ../../../../userfunction.zip .
+          cd ../../../../
+          zip -g userfunction.zip lambda_function.py
 
       - name: Upload Lambda packages to S3
         run: |
