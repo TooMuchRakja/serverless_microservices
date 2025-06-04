@@ -6,7 +6,6 @@ on:
       - main
 #ponizej mamy definicje zmiennych 
 env:
-  AWS_REGION: ${{ secrets.TF_REGION }} # TO JEST TO SAMO CO OSTATNIA ZMIENNA, RACZEJ DO WYRZUCENIA 
   S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
   TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
   TF_BUCKET_KEY: ${{ secrets.TF_BUCKET_KEY }}
@@ -26,9 +25,16 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.TF_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Install zip utility
         run: sudo apt-get install zip -y
-# MUSZE SPRAWDZIC CZEMU DLA PAKOWANIA ZALEZNOSCI STAWIAMY SRODOWISKO WIRUTALNE, I WOGOLE CZY MOZNA TO ROBIC Z POZIOMU REPOZYTORIUM 
+
       - name: Package Lambda authorizer_function
         working-directory: src/authorizer
         run: |
@@ -36,7 +42,7 @@ jobs:
           source test/bin/activate
           pip install -r requirements.txt
           zip -r ../../authorizer_function.zip lambda_function.py
-# TO SAMO CO WYZEJ 
+
       - name: Package Lambda userfunction
         working-directory: src/users
         run: |
