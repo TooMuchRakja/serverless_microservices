@@ -47,7 +47,7 @@ jobs:
           cd ../../../../
           # Do zipa dopakowujemy kod funkcji
           zip -g authorizer_function.zip lambda_function.py
- 
+# funkcja wyżej nie pakuje zależności 
       - name: Package Lambda userfunction
         working-directory: src/users
         run: |
@@ -59,9 +59,14 @@ jobs:
           cd ../../../../
           zip -g userfunction.zip lambda_function.py
 
-      - name: Upload Lambda packages to S3
+      - name: Upload authorizer function to S3
+        working-directory: src/authorizer
         run: |
           aws s3 cp authorizer_function.zip s3://$S3_BUCKET/
+      
+      - name: Upload user function to S3
+        working-directory: src/users
+        run: |
           aws s3 cp userfunction.zip s3://$S3_BUCKET/
 
       - name: Set up Terraform
