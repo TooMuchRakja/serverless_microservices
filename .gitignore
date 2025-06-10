@@ -1,0 +1,45 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+terraform.tfvars
+terraform.tfvars.json
+*.backup
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg-info/
+*.egg
+*.log
+*.out
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.pip-selfcheck.json
+
+# Test caches
+.pytest_cache/
+.tox/
+coverage.*
+htmlcov/
+nosetests.xml
+test-results/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+#other folders
+./wiaderko_lambda

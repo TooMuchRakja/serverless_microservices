@@ -1,0 +1,326 @@
+name: Terraform Deployment - test branch modules 2 and 3
+
+on:
+  push:
+    branches:
+      - test
+
+env:
+  S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
+  TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
+  TF_BUCKET_KEY: ${{ secrets.TF_BUCKET_KEY }}
+  TF_DYNAMO_TABLE: ${{ secrets.TF_DYNAMO_TABLE }}
+  TF_REGION: ${{ secrets.TF_REGION }}
+
+jobs:
+
+  initialize_env:
+    runs-on: ubuntu-latest
+    outputs:
+      done: ready
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.TF_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+# -------------------------------
+# PRZYKŁADOWY JOB DLA USER FUNCTION
+# -------------------------------
+  pack_user_function:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package Lambda userfunction
+        working-directory: ./users/src/users
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          cd venv/lib/python3.*/site-packages
+          zip -r9 ../../../../userfunction.zip .
+          cd ../../../../
+          zip -g userfunction.zip lambda_function.py
+          aws s3 cp userfunction.zip s3://$S3_BUCKET/
+          rm userfunction.zip
+
+# -------------------------------
+# PRZYKŁAD: AUTHORIZER
+# -------------------------------
+  pack_authorizer:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package Lambda authorizer
+        working-directory: ./users/src/authorizer
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          cd venv/lib/python3.*/site-packages
+          zip -r9 ../../../../authorizer_function.zip .
+          cd ../../../../
+          zip -g authorizer_function.zip lambda_function.py
+          aws s3 cp authorizer_function.zip s3://$S3_BUCKET/
+          rm authorizer_function.zip
+
+# -------------------------------
+# WARSTWA: REQUIREMENTS DLA ORDERS
+# -------------------------------
+  pack_order_requirements_layer:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package requirements layer
+        working-directory: ./orders/src/layers/requirements_layer
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt -t python/
+          zip -r9 ../../../../requirements_layer.zip python
+          aws s3 cp ../../../../requirements_layer.zip s3://$S3_BUCKET/
+          rm ../../../../requirements_layer.zip
+
+# -------------------------------
+# WARSTWA: get_function_layer
+# -------------------------------
+  pack_get_function_layer:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package get_order_layer
+        working-directory: ./orders/src/layers/get_function_layer
+        run: |
+          zip -r9 ../../../../get_order_layer.zip python
+          aws s3 cp ../../../../get_order_layer.zip s3://$S3_BUCKET/
+          rm ../../../../get_order_layer.zip
+
+# -------------------------------
+# FUNKCJE ORDERS
+# -------------------------------
+  pack_add_order:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package add_order_function
+        working-directory: ./orders/src/lambda_functions/add_order
+        run: |
+          zip -r9 ../../../../add_order_function.zip lambda_function.py
+          aws s3 cp ../../../../add_order_function.zip s3://$S3_BUCKET/
+          rm ../../../../add_order_function.zip
+
+  pack_delete_order:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package delete_order_function
+        working-directory: ./orders/src/lambda_functions/delete_order
+        run: |
+          zip -r9 ../../../../delete_order_function.zip lambda_function.py
+          aws s3 cp ../../../../delete_order_function.zip s3://$S3_BUCKET/
+          rm ../../../../delete_order_function.zip
+
+  pack_edit_order:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package edit_order_function
+        working-directory: ./orders/src/lambda_functions/edit_order
+        run: |
+          zip -r9 ../../../../edit_order_function.zip lambda_function.py
+          aws s3 cp ../../../../edit_order_function.zip s3://$S3_BUCKET/
+          rm ../../../../edit_order_function.zip
+
+  pack_get_order:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package get_order_function
+        working-directory: ./orders/src/lambda_functions/get_order
+        run: |
+          zip -r9 ../../../../get_order_function.zip lambda_function.py
+          aws s3 cp ../../../../get_order_function.zip s3://$S3_BUCKET/
+          rm ../../../../get_order_function.zip
+
+  pack_list_order:
+    needs: initialize_env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Package list_order_function
+        working-directory: ./orders/src/lambda_functions/list_order
+        run: |
+          zip -r9 ../../../../list_order_function.zip lambda_function.py
+          aws s3 cp ../../../../list_order_function.zip s3://$S3_BUCKET/
+          rm ../../../../list_order_function.zip
+
+pack_functions:
+  needs:
+    - pack_user_function
+    - pack_authorizer
+    - pack_order_requirements_layer
+    - pack_get_function_layer
+    - pack_add_order
+    - pack_delete_order
+    - pack_edit_order
+    - pack_get_order
+    - pack_list_order
+  runs-on: ubuntu-latest
+  steps:
+    - name: All functions packaged
+      run: echo "All Lambda functions and layers are packaged"
+
+
+  deploy_resources:
+    runs-on: ubuntu-latest
+    needs: pack_functions
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Generate backend config
+        run: |
+          cat <<EOF > backend.conf.hcl 
+          bucket         = "${TF_BUCKET_NAME}"
+          key            = "${TF_BUCKET_KEY}"
+          region         = "${TF_REGION}"
+          dynamodb_table = "${TF_DYNAMO_TABLE}"
+          encrypt        = true
+          EOF
+          
+      - name: Terraform Init
+        run: terraform init -backend-config=backend.conf.hcl 
+        working-directory: .
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+        working-directory: .
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve tfplan
+        working-directory: .
+
+      - name: Wait for resources to establish connections
+        run: sleep 60
+
+  test_users:
+    runs-on: ubuntu-latest
+    needs: deploy_resources
+    steps:
+      - name: Set up test environment for users module
+        run: |
+          python -m venv test
+          source test/bin/activate
+          pip install -r ./tests/requirements.txt
+        shell: bash
+
+      - name: Run Unit Tests
+        id: unit_tests
+        run: |
+          source test/bin/activate
+          PYTHONPATH=src python3 -m pytest tests/unit -v
+        shell: bash
+
+      - name: Run Integration Tests
+        id: integration_tests
+        run: |
+          source test/bin/activate
+          python3 -m pytest tests/integration -v
+        shell: bash
+
+      
+  test_orders:
+    runs-on: ubuntu-latest
+    needs: [deploy_resources, test_users]
+    steps:
+      - name: Set up test environment for orders module 
+        run: |
+          python -m venv test
+          source test/bin/activate
+          pip install -r ./orders/tests/requirements.txt
+        shell: bash
+
+      - name: Run Integration Tests for orders module
+        id: integration_tests
+        run: |
+          source test/bin/activate
+          python3 -m pytest tests/integration -v
+        shell: bash
+
+
+  rollback:
+    runs-on: ubuntu-latest
+    needs: deploy_resources
+    if: ${{ failure() }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.TF_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Generate backend config
+        run: |
+          cat <<EOF > backend.conf.hcl 
+          bucket         = "${TF_BUCKET_NAME}"
+          key            = "${TF_BUCKET_KEY}"
+          region         = "${TF_REGION}"
+          dynamodb_table = "${TF_DYNAMO_TABLE}"
+          encrypt        = true
+          EOF
+
+      - name: Terraform Init
+        run: terraform init -backend-config=backend.conf.hcl 
+        working-directory: .
+
+      - name: Rollback - Terraform Destroy
+        run: terraform destroy -auto-approve
+        working-directory: .
+
+      - name: Rollback - Delete Lambda ZIPs from S3
+        run: |
+          aws s3 rm s3://$S3_BUCKET/authorizer_function.zip || true
+          aws s3 rm s3://$S3_BUCKET/userfunction.zip || true
+          aws s3 rm s3://$S3_BUCKET/requirements_layer.zip || true
+          aws s3 rm s3://$S3_BUCKET/get_order_layer.zip|| true
+          aws s3 rm s3://$S3_BUCKET/edit_order_function.zip || true
+          aws s3 rm s3://$S3_BUCKET/list_order_function.zip || true
+          aws s3 rm s3://$S3_BUCKET/get_order_function.zip || true
+          aws s3 rm s3://$S3_BUCKET/delete_order_function.zip || true
