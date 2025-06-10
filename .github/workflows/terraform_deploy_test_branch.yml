@@ -100,40 +100,40 @@ jobs:
               source venv/bin/activate
               pip install -r requirements.txt
 
-              # Ścieżka wyjściowa dla ZIP-a
               ZIP_PATH="${{ github.workspace }}/${{ matrix.name }}.zip"
 
-              # Tworzenie ZIP z dependencies
               cd venv/lib/python3.*/site-packages
               zip -r9 "$ZIP_PATH" . || exit 1
 
-              # Dodanie funkcji Lambda (np. lambda_function.py)
               cd "$OLDPWD"
               zip -g "$ZIP_PATH" ${{ matrix.entry }} || exit 1
               ;;
-          esac
 
             layer_requirements)
               mkdir -p python
               python -m venv venv
               source venv/bin/activate
               pip install -r requirements.txt -t python/
-              zip -r9 ../../../../${{ matrix.name }}.zip python
+              zip -r9 "${{ github.workspace }}/${{ matrix.name }}.zip" python
               ;;
+
             layer_simple)
-              zip -r9 ../../../../${{ matrix.name }}.zip python
+              zip -r9 "${{ github.workspace }}/${{ matrix.name }}.zip" python
               ;;
+
             simple)
-              zip -r9 ../../../../${{ matrix.name }}.zip ${{ matrix.entry }}
+              zip -r9 "${{ github.workspace }}/${{ matrix.name }}.zip" ${{ matrix.entry }}
               ;;
+
             *)
               echo "Unsupported type: ${{ matrix.type }}"
               exit 1
               ;;
           esac
 
-          aws s3 cp ../../../../${{ matrix.name }}.zip s3://$S3_BUCKET/
-          rm ../../../../${{ matrix.name }}.zip
+          aws s3 cp "${{ github.workspace }}/${{ matrix.name }}.zip" s3://$S3_BUCKET/
+          rm "${{ github.workspace }}/${{ matrix.name }}.zip"
+
 
   deploy_resources:
     runs-on: ubuntu-latest
