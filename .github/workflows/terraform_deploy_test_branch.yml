@@ -16,8 +16,6 @@ jobs:
 
   initialize_env:
     runs-on: ubuntu-latest
-    outputs:
-      done: ready
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -34,24 +32,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-# -------------------------------
-# PRZYKŁADOWY JOB DLA USER FUNCTION
-# -------------------------------
-  name: Package Lambda Functions
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
   package_lambda:
     runs-on: ubuntu-latest
-
+    needs: initialize_env
     strategy:
       matrix:
         include:
-          # USERS - TYPY DLA FUNKCJI USERS 
           - name: userfunction
             path: ./users/src/users
             type: python
@@ -61,7 +47,6 @@ jobs:
             type: python
             entry: lambda_function.py
 
-          # ORDERS: TYPY DLA ORDERS LAYERS
           - name: requirements_layer
             path: ./orders/src/layers/requirements_layer
             type: layer_requirements
@@ -69,7 +54,6 @@ jobs:
             path: ./orders/src/layers/get_function_layer
             type: layer_simple
 
-          # ORDERS: TYP SIMPLE DLA POJEDYNCZYCH FUKNCJI 
           - name: add_order_function
             path: ./orders/src/lambda_functions/add_order
             type: simple
@@ -111,7 +95,6 @@ jobs:
         working-directory: ${{ matrix.path }}
         run: |
           case "${{ matrix.type }}" in
-
             python)
               python -m venv venv
               source venv/bin/activate
@@ -121,22 +104,19 @@ jobs:
               cd ../../../../
               zip -g ${{ matrix.name }}.zip ${{ matrix.entry }}
               ;;
-
             layer_requirements)
+              mkdir -p python
               python -m venv venv
               source venv/bin/activate
               pip install -r requirements.txt -t python/
               zip -r9 ../../../../${{ matrix.name }}.zip python
               ;;
-
             layer_simple)
               zip -r9 ../../../../${{ matrix.name }}.zip python
               ;;
-
             simple)
               zip -r9 ../../../../${{ matrix.name }}.zip ${{ matrix.entry }}
               ;;
-
             *)
               echo "Unsupported type: ${{ matrix.type }}"
               exit 1
@@ -146,29 +126,13 @@ jobs:
           aws s3 cp ../../../../${{ matrix.name }}.zip s3://$S3_BUCKET/
           rm ../../../../${{ matrix.name }}.zip
 
-  pack_functions:
-    needs:
-      - pack_user_function
-      - pack_authorizer
-      - pack_order_requirements_layer
-      - pack_get_function_layer
-      - pack_add_order
-      - pack_delete_order
-      - pack_edit_order
-      - pack_get_order
-      - pack_list_order
-    runs-on: ubuntu-latest
-    steps:
-      - name: All functions packaged
-        run: echo "All Lambda functions and layers are packaged"
-
-
   deploy_resources:
     runs-on: ubuntu-latest
-    needs: pack_functions
+    needs: package_lambda
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -181,9 +145,9 @@ jobs:
           dynamodb_table = "${TF_DYNAMO_TABLE}"
           encrypt        = true
           EOF
-          
+
       - name: Terraform Init
-        run: terraform init -backend-config=backend.conf.hcl 
+        run: terraform init -backend-config=backend.conf.hcl
         working-directory: .
 
       - name: Terraform Plan
@@ -206,24 +170,23 @@ jobs:
         run: |
           python -m venv test
           source test/bin/activate
-          pip install -r ./tests/requirements.txt
+          pip install -r ./users/tests/requirements.txt
         shell: bash
 
       - name: Run Unit Tests
         id: unit_tests
         run: |
           source test/bin/activate
-          PYTHONPATH=src python3 -m pytest tests/unit -v
+          PYTHONPATH=./users/src python3 -m pytest ./users/tests/unit -v
         shell: bash
 
       - name: Run Integration Tests
         id: integration_tests
         run: |
           source test/bin/activate
-          python3 -m pytest tests/integration -v
+          PYTHONPATH=./users/src python3 -m pytest ./users/tests/integration -v
         shell: bash
 
-      
   test_orders:
     runs-on: ubuntu-latest
     needs: [deploy_resources, test_users]
@@ -239,9 +202,8 @@ jobs:
         id: integration_tests
         run: |
           source venv/bin/activate
-          python3 -m pytest tests/integration -v
+          PYTHONPATH=./orders/src python3 -m pytest ./orders/tests/integration -v
         shell: bash
-
 
   rollback:
     runs-on: ubuntu-latest
@@ -281,11 +243,16 @@ jobs:
 
       - name: Rollback - Delete Lambda ZIPs from S3
         run: |
-          aws s3 rm s3://$S3_BUCKET/authorizer_function.zip || true
-          aws s3 rm s3://$S3_BUCKET/userfunction.zip || true
-          aws s3 rm s3://$S3_BUCKET/requirements_layer.zip || true
-          aws s3 rm s3://$S3_BUCKET/get_order_layer.zip|| true
-          aws s3 rm s3://$S3_BUCKET/edit_order_function.zip || true
-          aws s3 rm s3://$S3_BUCKET/list_order_function.zip || true
-          aws s3 rm s3://$S3_BUCKET/get_order_function.zip || true
-          aws s3 rm s3://$S3_BUCKET/delete_order_function.zip || true
+          for file in \
+            authorizer_function.zip \
+            userfunction.zip \
+            requirements_layer.zip \
+            get_order_layer.zip \
+            edit_order_function.zip \
+            list_order_function.zip \
+            get_order_function.zip \
+            delete_order_function.zip \
+            add_order_function.zip
+          do
+            aws s3 rm s3://$S3_BUCKET/$file || true
+          done
