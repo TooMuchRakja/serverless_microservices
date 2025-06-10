@@ -42,4 +42,4 @@ test-results/
 Thumbs.db
 
 #other folders
-./wiaderko_lambda/*
+wiaderko_lambda/
