@@ -181,21 +181,21 @@ jobs:
           aws s3 cp ../../../../list_order_function.zip s3://$S3_BUCKET/
           rm ../../../../list_order_function.zip
 
-pack_functions:
-  needs:
-    - pack_user_function
-    - pack_authorizer
-    - pack_order_requirements_layer
-    - pack_get_function_layer
-    - pack_add_order
-    - pack_delete_order
-    - pack_edit_order
-    - pack_get_order
-    - pack_list_order
-  runs-on: ubuntu-latest
-  steps:
-    - name: All functions packaged
-      run: echo "All Lambda functions and layers are packaged"
+  pack_functions:
+    needs:
+      - pack_user_function
+      - pack_authorizer
+      - pack_order_requirements_layer
+      - pack_get_function_layer
+      - pack_add_order
+      - pack_delete_order
+      - pack_edit_order
+      - pack_get_order
+      - pack_list_order
+    runs-on: ubuntu-latest
+    steps:
+      - name: All functions packaged
+        run: echo "All Lambda functions and layers are packaged"
 
 
   deploy_resources:
@@ -266,14 +266,14 @@ pack_functions:
       - name: Set up test environment for orders module 
         run: |
           python -m venv test
-          source test/bin/activate
+          source venv/bin/activate
           pip install -r ./orders/tests/requirements.txt
         shell: bash
 
       - name: Run Integration Tests for orders module
         id: integration_tests
         run: |
-          source test/bin/activate
+          source venv/bin/activate
           python3 -m pytest tests/integration -v
         shell: bash
 
