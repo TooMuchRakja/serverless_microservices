@@ -14,7 +14,6 @@ provider "aws" {
 
 module "global_api" {
   source = "./global_api_settings"
-  region = var.region
   api_account_name = var.stack_name
 }
 
