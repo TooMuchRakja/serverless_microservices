@@ -1,3 +1,3 @@
-variablel "api_account_name" {
+variable "api_account_name" {
     type = string
 }

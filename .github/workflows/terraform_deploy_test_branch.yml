@@ -37,149 +37,114 @@ jobs:
 # -------------------------------
 # PRZYKŁADOWY JOB DLA USER FUNCTION
 # -------------------------------
-  pack_user_function:
-    needs: initialize_env
+  name: Package Lambda Functions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  package_lambda:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          # USERS - TYPY DLA FUNKCJI USERS 
+          - name: userfunction
+            path: ./users/src/users
+            type: python
+            entry: lambda_function.py
+          - name: authorizer_function
+            path: ./users/src/authorizer
+            type: python
+            entry: lambda_function.py
+
+          # ORDERS: TYPY DLA ORDERS LAYERS
+          - name: requirements_layer
+            path: ./orders/src/layers/requirements_layer
+            type: layer_requirements
+          - name: get_order_layer
+            path: ./orders/src/layers/get_function_layer
+            type: layer_simple
+
+          # ORDERS: TYP SIMPLE DLA POJEDYNCZYCH FUKNCJI 
+          - name: add_order_function
+            path: ./orders/src/lambda_functions/add_order
+            type: simple
+            entry: lambda_function.py
+          - name: delete_order_function
+            path: ./orders/src/lambda_functions/delete_order
+            type: simple
+            entry: lambda_function.py
+          - name: edit_order_function
+            path: ./orders/src/lambda_functions/edit_order
+            type: simple
+            entry: lambda_function.py
+          - name: get_order_function
+            path: ./orders/src/lambda_functions/get_order
+            type: simple
+            entry: lambda_function.py
+          - name: list_order_function
+            path: ./orders/src/lambda_functions/list_order
+            type: simple
+            entry: lambda_function.py
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Package Lambda userfunction
-        working-directory: ./users/src/users
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.TF_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Package ${{ matrix.name }}
+        working-directory: ${{ matrix.path }}
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-          cd venv/lib/python3.*/site-packages
-          zip -r9 ../../../../userfunction.zip .
-          cd ../../../../
-          zip -g userfunction.zip lambda_function.py
-          aws s3 cp userfunction.zip s3://$S3_BUCKET/
-          rm userfunction.zip
+          case "${{ matrix.type }}" in
 
-# -------------------------------
-# PRZYKŁAD: AUTHORIZER
-# -------------------------------
-  pack_authorizer:
-    needs: initialize_env
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+            python)
+              python -m venv venv
+              source venv/bin/activate
+              pip install -r requirements.txt
+              cd venv/lib/python3.*/site-packages
+              zip -r9 ../../../../${{ matrix.name }}.zip .
+              cd ../../../../
+              zip -g ${{ matrix.name }}.zip ${{ matrix.entry }}
+              ;;
 
-      - name: Package Lambda authorizer
-        working-directory: ./users/src/authorizer
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-          cd venv/lib/python3.*/site-packages
-          zip -r9 ../../../../authorizer_function.zip .
-          cd ../../../../
-          zip -g authorizer_function.zip lambda_function.py
-          aws s3 cp authorizer_function.zip s3://$S3_BUCKET/
-          rm authorizer_function.zip
+            layer_requirements)
+              python -m venv venv
+              source venv/bin/activate
+              pip install -r requirements.txt -t python/
+              zip -r9 ../../../../${{ matrix.name }}.zip python
+              ;;
 
-# -------------------------------
-# WARSTWA: REQUIREMENTS DLA ORDERS
-# -------------------------------
-  pack_order_requirements_layer:
-    needs: initialize_env
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+            layer_simple)
+              zip -r9 ../../../../${{ matrix.name }}.zip python
+              ;;
 
-      - name: Package requirements layer
-        working-directory: ./orders/src/layers/requirements_layer
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt -t python/
-          zip -r9 ../../../../requirements_layer.zip python
-          aws s3 cp ../../../../requirements_layer.zip s3://$S3_BUCKET/
-          rm ../../../../requirements_layer.zip
+            simple)
+              zip -r9 ../../../../${{ matrix.name }}.zip ${{ matrix.entry }}
+              ;;
 
-# -------------------------------
-# WARSTWA: get_function_layer
-# -------------------------------
-  pack_get_function_layer:
-    needs: initialize_env
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+            *)
+              echo "Unsupported type: ${{ matrix.type }}"
+              exit 1
+              ;;
+          esac
 
-      - name: Package get_order_layer
-        working-directory: ./orders/src/layers/get_function_layer
-        run: |
-          zip -r9 ../../../../get_order_layer.zip python
-          aws s3 cp ../../../../get_order_layer.zip s3://$S3_BUCKET/
-          rm ../../../../get_order_layer.zip
-
-# -------------------------------
-# FUNKCJE ORDERS
-# -------------------------------
-  pack_add_order:
-    needs: initialize_env
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Package add_order_function
-        working-directory: ./orders/src/lambda_functions/add_order
-        run: |
-          zip -r9 ../../../../add_order_function.zip lambda_function.py
-          aws s3 cp ../../../../add_order_function.zip s3://$S3_BUCKET/
-          rm ../../../../add_order_function.zip
-
-  pack_delete_order:
-    needs: initialize_env
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Package delete_order_function
-        working-directory: ./orders/src/lambda_functions/delete_order
-        run: |
-          zip -r9 ../../../../delete_order_function.zip lambda_function.py
-          aws s3 cp ../../../../delete_order_function.zip s3://$S3_BUCKET/
-          rm ../../../../delete_order_function.zip
-
-  pack_edit_order:
-    needs: initialize_env
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Package edit_order_function
-        working-directory: ./orders/src/lambda_functions/edit_order
-        run: |
-          zip -r9 ../../../../edit_order_function.zip lambda_function.py
-          aws s3 cp ../../../../edit_order_function.zip s3://$S3_BUCKET/
-          rm ../../../../edit_order_function.zip
-
-  pack_get_order:
-    needs: initialize_env
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Package get_order_function
-        working-directory: ./orders/src/lambda_functions/get_order
-        run: |
-          zip -r9 ../../../../get_order_function.zip lambda_function.py
-          aws s3 cp ../../../../get_order_function.zip s3://$S3_BUCKET/
-          rm ../../../../get_order_function.zip
-
-  pack_list_order:
-    needs: initialize_env
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Package list_order_function
-        working-directory: ./orders/src/lambda_functions/list_order
-        run: |
-          zip -r9 ../../../../list_order_function.zip lambda_function.py
-          aws s3 cp ../../../../list_order_function.zip s3://$S3_BUCKET/
-          rm ../../../../list_order_function.zip
+          aws s3 cp ../../../../${{ matrix.name }}.zip s3://$S3_BUCKET/
+          rm ../../../../${{ matrix.name }}.zip
 
   pack_functions:
     needs:

@@ -26,7 +26,7 @@ variable "cognito_user_pool_id" {
   type = string
 }
 
-variable " global_api_logging_role_arn" {
+variable "global_api_logging_role_arn" {
   type = string
 }
 

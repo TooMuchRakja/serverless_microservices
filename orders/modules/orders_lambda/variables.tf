@@ -33,11 +33,11 @@ variable "lambda_timeout" {
   default = 30
 }
 
-varibale "orders_dynamodb_table_name" {
+variable "orders_dynamodb_table_name" {
   type    = string
 }
 
-varibale "add_order_function_role_arn" {
+variable "add_order_function_role_arn" {
   type    = string
 }
 

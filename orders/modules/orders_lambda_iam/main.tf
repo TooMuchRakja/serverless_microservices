@@ -124,7 +124,7 @@ resource "aws_iam_policy" "edit_order_function_policy" {
 }
 EOF
 }
-resource "aws_iam_policy_attachment" "add_order_function_attach" {
+resource "aws_iam_policy_attachment" "edit_order_function_attach" {
   name       = "${var.edit_order_function_name}-lambda_attachment"
   roles      = [aws_iam_role.edit_order_function_role]
   policy_arn = aws_iam_policy.edit_order_function_policy.arn
