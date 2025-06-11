@@ -2,6 +2,12 @@ name: destroy
 
 on:
   workflow_dispatch:  # ręczne wywołanie
+env:
+  S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
+  TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
+  TF_BUCKET_KEY: ${{ secrets.TF_BUCKET_KEY }}
+  TF_DYNAMO_TABLE: ${{ secrets.TF_DYNAMO_TABLE }}
+  TF_REGION: ${{ secrets.TF_REGION }}
 
 jobs:
   destroy:
@@ -13,7 +19,7 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ env.TF_REGION }}
+          aws-region: ${{ secrets.TF_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -34,6 +40,6 @@ jobs:
         run: terraform init -backend-config=backend.conf.hcl 
         working-directory: .
 
-      - name: Rollback - Terraform Destroy
+      - name: Terraform Destroy
         run: terraform destroy -auto-approve
         working-directory: .
