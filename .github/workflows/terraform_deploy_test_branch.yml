@@ -131,10 +131,13 @@ jobs:
               ;;
           esac
 
-          aws s3 cp "${{ github.workspace }}/${{ matrix.name }}.zip" s3://$S3_BUCKET/
-          rm "${{ github.workspace }}/${{ matrix.name }}.zip"
-
-
+          if aws s3 ls "s3://$S3_BUCKET/${{ matrix.name }}.zip" > /dev/null 2>&1; then
+            echo "Lambda package ${{ matrix.name }}.zip already exists in S3. Skipping upload."
+          else
+            aws s3 cp "${{ github.workspace }}/${{ matrix.name }}.zip" s3://$S3_BUCKET/
+            rm "${{ github.workspace }}/${{ matrix.name }}.zip"
+          fi
+          
   deploy_resources:
     runs-on: ubuntu-latest
     needs: package_lambda
@@ -191,7 +194,7 @@ jobs:
         run: |
           python -m venv test
           source test/bin/activate
-          pip install -r ./users/tests/requirements.txt
+          pip install -r users/tests/requirements.txt
         shell: bash
 
       - name: Run Unit Tests
@@ -216,7 +219,7 @@ jobs:
         run: |
           python -m venv test
           source venv/bin/activate
-          pip install -r ./orders/tests/requirements.txt
+          pip install -r orders/tests/requirements.txt
         shell: bash
 
       - name: Run Integration Tests for orders module
@@ -228,7 +231,7 @@ jobs:
 
   rollback:
     runs-on: ubuntu-latest
-    needs: deploy_resources
+    needs: [deploy_resources, test_users, test_orders]
     if: ${{ failure() }}
     steps:
       - name: Checkout repo
@@ -262,18 +265,4 @@ jobs:
         run: terraform destroy -auto-approve
         working-directory: .
 
-      - name: Rollback - Delete Lambda ZIPs from S3
-        run: |
-          for file in \
-            authorizer_function.zip \
-            userfunction.zip \
-            requirements_layer.zip \
-            get_order_layer.zip \
-            edit_order_function.zip \
-            list_order_function.zip \
-            get_order_function.zip \
-            delete_order_function.zip \
-            add_order_function.zip
-          do
-            aws s3 rm s3://$S3_BUCKET/$file || true
-          done
+
