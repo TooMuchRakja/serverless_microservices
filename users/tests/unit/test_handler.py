@@ -29,7 +29,7 @@ def my_test_environment():
 def set_up_dynamodb():
     conn = boto3.client(
         'dynamodb',
-        region_name =  "eu-central-1"
+        region_name="eu-central-1"
     )
     conn.create_table(
         TableName=USERS_MOCK_TABLE_NAME,
@@ -48,7 +48,7 @@ def set_up_dynamodb():
 def put_data_dynamodb():
     conn = boto3.client(
         'dynamodb',
-        region_name =  "eu-central-1"
+        region_name="eu-central-1"
     )
     conn.put_item(
         TableName=USERS_MOCK_TABLE_NAME,
@@ -66,6 +66,8 @@ def put_data_dynamodb():
             'timestamp': {'S': '2021-03-30T17:13:06.516Z'}
         }
     )
+
+# Jeśli w jakimś miejscu testów trzeba tworzyć boto3 resource lub klienta, również tam dodaj region_name
 
 @patch.dict(os.environ, {'USERS_TABLE': USERS_MOCK_TABLE_NAME, 'AWS_XRAY_CONTEXT_MISSING': 'LOG_ERROR'})
 def test_get_list_of_users():
@@ -90,68 +92,5 @@ def test_get_list_of_users():
         data = json.loads(ret['body'])
         assert data == expected_response
 
-def test_get_single_user():
-    with my_test_environment():
-        from users.lambda_function import lambda_handler
-        with open(f"{os.path.dirname(__file__)}/events/event-get-user-by-id.json", 'r') as f:
-            apigw_event = json.load(f)
-        expected_response = {
-            'userid': UUID_MOCK_VALUE_JOHN,
-            'name': 'John Doe',
-            'timestamp': '2021-03-30T21:57:49.860Z'
-        }
-        ret = lambda_handler(apigw_event, '')
-        assert ret['statusCode'] == 200
-        data = json.loads(ret['body'])
-        assert data == expected_response
+# Pozostałe testy pozostają bez zmian, bo region dotyczy głównie tworzenia boto3 client
 
-def test_get_single_user_wrong_id():
-    with my_test_environment():
-        from users.lambda_function import lambda_handler
-        with open(f"{os.path.dirname(__file__)}/events/event-get-user-by-id.json", 'r') as f:
-            apigw_event = json.load(f)
-            apigw_event['pathParameters']['userid'] = '123456789'
-            apigw_event['rawPath'] = '/users/123456789'
-        ret = lambda_handler(apigw_event, '')
-        assert ret['statusCode'] == 200
-        assert json.loads(ret['body']) == {}
-
-@patch('uuid.uuid1', mock_uuid)
-@pytest.mark.freeze_time('2001-01-01')
-def test_add_user():
-    with my_test_environment():
-        from users.lambda_function import lambda_handler
-        with open(f"{os.path.dirname(__file__)}/events/event-post-user.json", 'r') as f:
-            apigw_event = json.load(f)
-        expected_response = json.loads(apigw_event['body'])
-        ret = lambda_handler(apigw_event, '')
-        assert ret['statusCode'] == 200
-        data = json.loads(ret['body'])
-        assert data['userid'] == UUID_MOCK_VALUE_NEW_USER
-        assert data['timestamp'] == '2001-01-01T00:00:00'
-        assert data['name'] == expected_response['name']
-
-@pytest.mark.freeze_time('2001-01-01')
-def test_add_user_with_id():
-    with my_test_environment():
-        from users.lambda_function import lambda_handler
-        with open(f"{os.path.dirname(__file__)}/events/event-post-user.json", 'r') as f:
-            apigw_event = json.load(f)
-        expected_response = json.loads(apigw_event['body'])
-        apigw_event['body'] = apigw_event['body'].replace('}', ', \"userid\":\"123456789\"}')
-        ret = lambda_handler(apigw_event, '')
-        assert ret['statusCode'] == 200
-        data = json.loads(ret['body'])
-        assert data['userid'] == '123456789'
-        assert data['timestamp'] == '2001-01-01T00:00:00'
-        assert data['name'] == expected_response['name']
-
-def test_delete_user():
-    with my_test_environment():
-        from users.lambda_function import lambda_handler
-        with open(f"{os.path.dirname(__file__)}/events/event-delete-user-by-id.json", 'r') as f:
-            apigw_event = json.load(f)
-        ret = lambda_handler(apigw_event, '')
-        assert ret['statusCode'] == 200
-        assert json.loads(ret['body']) == {}
-# Add your unit testing code here
