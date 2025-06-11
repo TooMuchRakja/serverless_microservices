@@ -190,6 +190,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy_resources
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
       - name: Set up test environment for users module
         run: |
           python -m venv test
@@ -215,6 +218,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy_resources, test_users]
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        
       - name: Set up test environment for orders module 
         run: |
           python -m venv test
