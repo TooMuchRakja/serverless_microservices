@@ -25,7 +25,6 @@ module "orders_lambda" {
   delete_order_function_name = var.delete_order_function_name
   get_order_function_name = var.get_order_function_name
   list_order_function_name = var.list_order_function_name
-  stack_name               = var.stack_name
   orders_dynamodb_table_name = module.orders_dynamodb.orders_dynamodb_table_name
   add_order_function_role_arn = module.orders_iam.add_order_function_role_arn
   edit_order_function_role_arn = module.orders_iam.edit_order_function_role_arn
