@@ -28,7 +28,8 @@ def my_test_environment():
 
 def set_up_dynamodb():
     conn = boto3.client(
-        'dynamodb'
+        'dynamodb',
+        region_name =  "eu-central-1"
     )
     conn.create_table(
         TableName=USERS_MOCK_TABLE_NAME,
@@ -46,7 +47,8 @@ def set_up_dynamodb():
 
 def put_data_dynamodb():
     conn = boto3.client(
-        'dynamodb'
+        'dynamodb',
+        region_name =  "eu-central-1"
     )
     conn.put_item(
         TableName=USERS_MOCK_TABLE_NAME,
