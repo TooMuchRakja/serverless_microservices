@@ -46,7 +46,4 @@ jobs:
         run: terraform destroy -auto-approve
         working-directory: .
 
-      - name: Delete Lambda ZIPs from S3
-        run: |
-          aws s3 rm s3://$S3_BUCKET/authorizer_function.zip || true
-          aws s3 rm s3://$S3_BUCKET/userfunction.zip || true
+
