@@ -50,7 +50,7 @@ resource "aws_iam_policy" "add_order_function_policy" {
     },
     {
       "Action": [
-        "xray:PutTraceSegments",,
+        "xray:PutTraceSegments",
         "xray:PutTelemetryRecords"
       ],
       "Effect": "Allow",
@@ -62,7 +62,7 @@ EOF
 }
 resource "aws_iam_policy_attachment" "add_order_function_attach" {
   name       = "${var.add_order_function_name}-lambda_attachment"
-  roles      = [aws_iam_role.add_order_function_role]
+  roles      = [aws_iam_role.add_order_function_role.name] # tutaj wymagana jest nazwa jako string
   policy_arn = aws_iam_policy.add_order_function_policy.arn
 }
 
@@ -126,7 +126,7 @@ EOF
 }
 resource "aws_iam_policy_attachment" "edit_order_function_attach" {
   name       = "${var.edit_order_function_name}-lambda_attachment"
-  roles      = [aws_iam_role.edit_order_function_role]
+  roles      = [aws_iam_role.edit_order_function_role.name]
   policy_arn = aws_iam_policy.edit_order_function_policy.arn
 }
 
@@ -191,7 +191,7 @@ EOF
 }
 resource "aws_iam_policy_attachment" "delete_order_function_attach" {
   name       = "${var.delete_order_function_name}-lambda_attachment"
-  roles      = [aws_iam_role.delete_order_function_role]
+  roles      = [aws_iam_role.delete_order_function_role.name]
   policy_arn = aws_iam_policy.delete_order_function_policy.arn
 }
 
@@ -253,7 +253,7 @@ EOF
 }
 resource "aws_iam_policy_attachment" "get_order_function_attach" {
   name       = "${var.get_order_function_name}-lambda_attachment"
-  roles      = [aws_iam_role.get_order_function_role]
+  roles      = [aws_iam_role.get_order_function_role.name]
   policy_arn = aws_iam_policy.get_order_function_policy.arn
 }
 
@@ -317,6 +317,6 @@ EOF
 }
 resource "aws_iam_policy_attachment" "list_order_function_attach" {
   name       = "${var.list_order_function_name}-lambda_attachment"
-  roles      = [aws_iam_role.list_order_function_role]
+  roles      = [aws_iam_role.list_order_function_role.name]
   policy_arn = aws_iam_policy.list_order_function_policy.arn
 }
