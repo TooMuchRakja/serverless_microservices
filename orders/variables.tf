@@ -10,10 +10,6 @@ variable "sns_email" {
   default = "szymekp1994@gmail.com"
 }
 
-variable "orders_table_name" {
-  type = string
-}
-
 variable "add_order_function_name" {
   type    = string
   default = "serverless-ws-add-order-function"
