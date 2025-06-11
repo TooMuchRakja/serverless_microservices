@@ -2,7 +2,7 @@
 # wraz z authorizerem będę miał tutaj definicję uprawnień iam dla tej funkcji 
 
 data "aws_secretsmanager_secret_version" "bucket_name_secret" {
-  secret_id = "my-bucket-name-secret"
+  secret_id = "my-bucket-name-secret-v2"
 }
 
 locals {
