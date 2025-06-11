@@ -37,3 +37,10 @@ output "users_cloudwatch_dashboardURL" {
     value = module.cloudwatch_dashboard.dashboard_url
 }
 
+output "auth_lambda_function_name" {
+    value = module.lambda_authorizer.lambda_auth_name
+}
+
+output "users_cloudwatch_dashboardURL" {
+    value = module.cloudwatch_dashboard.dashboard_url
+}

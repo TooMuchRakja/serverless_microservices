@@ -30,11 +30,11 @@ output "cognito_auth_command" {
     value = module.users.cognito_auth_command
 }
 output "auth_lambda_function_name" {
-    value = module.users.lambda_auth_name
+    value = module.users.auth_lambda_function_name
 }
 
 output "users_cloudwatch_dashboardURL" {
-    value = module.users.dashboardURL
+    value = module.users.users_cloudwatch_dashboardURL
 }
 
 output "orders_dynamodb_table_name" {

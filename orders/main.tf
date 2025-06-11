@@ -6,7 +6,7 @@ module "orders_apigateway" {
   edit_order_function_arn = module.orders_lambda.edit_order_lambda_arn
   delete_order_function_arn = module.orders_lambda.delete_order_lambda_arn
   get_order_function_arn = module.orders_lambda.get_order_lambda_arn
-  list_order_function_arn = module.orders_lambda.list_orders_lambda_arn
+  list_order_function_arn = module.orders_lambda.list_order_lambda_arn
   cognito_user_pool_id = var.cognito_user_pool_id
   global_api_logging_role_arn = var.global_api_logging_role_arn
   orders_api_access_logs = var.orders_api_access_logs
