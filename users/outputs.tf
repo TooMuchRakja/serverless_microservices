@@ -29,13 +29,6 @@ output "cognito_login_url" {
 output "cognito_auth_command" {
     value = module.cognito.CognitoAuthCommand
 }
-output "auth_lambda_function_name" {
-    value = module.lambda_authorizer.lambda_auth_name
-}
-
-output "users_cloudwatch_dashboardURL" {
-    value = module.cloudwatch_dashboard.dashboard_url
-}
 
 output "auth_lambda_function_name" {
     value = module.lambda_authorizer.lambda_auth_name
