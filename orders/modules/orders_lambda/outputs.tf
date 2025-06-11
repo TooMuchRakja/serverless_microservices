@@ -14,6 +14,6 @@ output "get_order_lambda_arn" {
     value = aws_lambda_function.get_order_lambda.arn
 }
 
-output "list_orders_lambda_arn" {
-    value = aws_lambda_function.list_orders_lambda.arn
+output "list_order_lambda_arn" {
+    value = aws_lambda_function.list_order_lambda.arn
 }

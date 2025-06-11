@@ -126,7 +126,6 @@ resource "aws_lambda_function" "list_order_lambda" {
 
 # TWORZENIE LAMBDA LAYER DLA REQUIREMENTS 
 resource "aws_lambda_layer_version" "requirements_layer" {
-  filename = "requirements_layer.zip"
   layer_name = "requirements_layer"
   s3_bucket = local.lambda_code_bucket
   s3_key = "requirements_layer.zip"
@@ -135,7 +134,6 @@ resource "aws_lambda_layer_version" "requirements_layer" {
 
 #TWORZENIE LAMBDA LAYER DLA FUNKCJI GET - BĘDZIE ONA UZYWANA PRZEZ KILKA FUNKCJI - GET, EDIT, DELETE
 resource "aws_lambda_layer_version" "get_order_layer" {
-  filename = "get_order_layer.zip"
   layer_name = "get_order_layer"
   s3_bucket = local.lambda_code_bucket
   s3_key = "get_order_layer.zip"

@@ -15,5 +15,5 @@ output "get_order_function_role_arn" {
 }
 
 output "list_order_function_role_arn" {
-    value = aws_iam_role.list_orders_function_role.arn
+    value = aws_iam_role.list_order_function_role.arn
 }

@@ -30,7 +30,7 @@ variable "get_order_function_name" {
   default = "serverless-ws-get-order-function"
 }
 
-variable "list_orders_function_name" {
+variable "list_order_function_name" {
   type    = string
   default = "serverless-ws-list-orders-function"
 }

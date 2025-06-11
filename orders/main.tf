@@ -26,11 +26,11 @@ module "orders_lambda" {
   get_order_function_name = var.get_order_function_name
   list_order_function_name = var.list_order_function_name
   orders_dynamodb_table_name = module.orders_dynamodb.orders_dynamodb_table_name
-  add_order_function_role_arn = module.orders_iam.add_order_function_role_arn
-  edit_order_function_role_arn = module.orders_iam.edit_order_function_role_arn
-  delete_order_function_role_arn = module.orders_iam.delete_order_function_role_arn
-  get_order_function_role_arn = module.orders_iam.get_order_function_role_arn
-  list_order_function_role_arn = module.orders_iam.list_order_function_role_arn
+  add_order_function_role_arn = module.orders_lambda_iam.add_order_function_role_arn
+  edit_order_function_role_arn = module.orders_lambda_iam.edit_order_function_role_arn
+  delete_order_function_role_arn = module.orders_lambda_iam.delete_order_function_role_arn
+  get_order_function_role_arn = module.orders_lambda_iam.get_order_function_role_arn
+  list_order_function_role_arn = module.orders_lambda_iam.list_order_function_role_arn
 
 }
 
