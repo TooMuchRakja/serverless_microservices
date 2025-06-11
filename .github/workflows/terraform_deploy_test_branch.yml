@@ -258,9 +258,9 @@ jobs:
         run: terraform init -backend-config=backend.conf.hcl 
         working-directory: .
 
-      - name: Rollback - Terraform Destroy
-        run: terraform destroy -auto-approve
-        working-directory: .
+      #- name: Rollback - Terraform Destroy
+       # run: terraform destroy -auto-approve
+        #working-directory: .
 
       - name: Rollback - Delete Lambda ZIPs from S3
         run: |
