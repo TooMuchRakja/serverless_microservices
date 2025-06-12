@@ -1,7 +1,7 @@
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
-# DODAĆ POPRAWNE WARTOŚCI DO API 
+# DODAĆ POPRAWNE WARTOŚCI DO API GATEWAY 
 
 resource "aws_api_gateway_rest_api" "orders_api" {
   endpoint_configuration {
