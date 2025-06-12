@@ -9,7 +9,7 @@ resource "aws_api_gateway_rest_api" "orders_api" {
   }
   name = "serverless-workshop-OrdersAPI" #nazwaAPI
   body = jsonencode({
-    openapi = "3.0.3"
+    openapi = "3.0.1"
     info = {
       title       = "Orders API"
       version     = "1.0.0"
@@ -37,7 +37,7 @@ resource "aws_api_gateway_rest_api" "orders_api" {
             uri                  = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.list_order_function_arn}/invocations"
             httpMethod           = "POST"
             type                 = "aws_proxy"
-            payloadFormatVersion = "2.0"
+            payloadFormatVersion = "1.0"
           }
         },
         post = {
@@ -70,7 +70,7 @@ resource "aws_api_gateway_rest_api" "orders_api" {
             uri                  = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.add_order_function_arn}/invocations"
             httpMethod           = "POST"
             type                 = "aws_proxy"
-            payloadFormatVersion = "2.0"
+            payloadFormatVersion = "1.0"
           }
         }
       },
@@ -103,7 +103,7 @@ resource "aws_api_gateway_rest_api" "orders_api" {
             uri                  = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.get_order_function_arn}/invocations"
             httpMethod           = "POST"
             type                 = "aws_proxy"
-            payloadFormatVersion = "2.0"
+            payloadFormatVersion = "1.0"
           }
         },
         put = {
@@ -144,7 +144,7 @@ resource "aws_api_gateway_rest_api" "orders_api" {
             uri                  = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.edit_order_function_arn}/invocations"
             httpMethod           = "POST"
             type                 = "aws_proxy"
-            payloadFormatVersion = "2.0"
+            payloadFormatVersion = "1.0"
           }
         },
         delete = {
@@ -175,7 +175,7 @@ resource "aws_api_gateway_rest_api" "orders_api" {
             uri                  = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.delete_order_function_arn}/invocations"
             httpMethod           = "POST"
             type                 = "aws_proxy"
-            payloadFormatVersion = "2.0"
+            payloadFormatVersion = "1.0"
           }
         }
       }
@@ -187,11 +187,13 @@ resource "aws_api_gateway_rest_api" "orders_api" {
           name = "Authorization"
           in   = "header"
           x-amazon-apigateway-authorizer = {
-            type = "cognito_user_pools"
+            type                         = "cognito_user_pools"
+            identitySource               = "method.request.header.Authorization"
             providerARNs = [
               "arn:aws:cognito-idp:${var.region}:${data.aws_caller_identity.current.account_id}:userpool/${var.cognito_user_pool_id}"
             ]
           }
+          x-amazon-apigateway-authtype = "cognito_user_pools"
         }
       },
       schemas = {

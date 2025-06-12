@@ -39,7 +39,7 @@ def orders_endpoint(global_config):
 @pytest.fixture
 def user_token(global_config):
   '''Returns the user_token for authentication to the Orders service'''
-  user_token = global_config["user1AccessToken"]
+  user_token = global_config["user1UserIdToken"]
   logger.debug("     User Token = " + user_token)
   return user_token
 
