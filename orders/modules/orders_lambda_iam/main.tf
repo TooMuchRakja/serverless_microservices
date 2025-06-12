@@ -95,6 +95,7 @@ resource "aws_iam_policy" "edit_order_function_policy" {
   "Statement": [
     {
       "Action": [
+        "dynamodb:PutItem",
         "dynamodb:UpdateItem",
         "dynamodb:Query",
         "dynamodb:GetItem",
