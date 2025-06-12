@@ -180,51 +180,46 @@ jobs:
   # Odkomentuj gdy będziesz gotowy do faktycznego deployu
       - name: Terraform Apply
         id: apply
-        #env:
-        #  TF_LOG: DEBUG
-        #  TF_LOG_PATH: ./terraform.log
         run: terraform apply -auto-approve tfplan
         working-directory: .
 
-      #- name: Show Terraform log output
-      #  run: cat ./terraform.log
-      #  working-directory: .
 
-      #- name: Wait for resources to establish connections
-      #  run: sleep 30
+
+      - name: Wait for resources to establish connections
+        run: sleep 30
 
       # ---- Testy modułu użytkowników ----
-      #- name: Set up test environment for users module
-      #  run: |
-      #    python -m venv test
-      #    source test/bin/activate
-      #    pip install -r users/tests/requirements.txt
-      #  shell: bash
+      - name: Set up test environment for users module
+        run: |
+          python -m venv test
+          source test/bin/activate
+          pip install -r users/tests/requirements.txt
+        shell: bash
 
-      #- name: Run Unit Tests for users module
-      #  run: |
-      #    source test/bin/activate
-      #    PYTHONPATH=users/src python3 -m pytest users/tests/unit -v
-      #  shell: bash
+      - name: Run Unit Tests for users module
+        run: |
+          source test/bin/activate
+          PYTHONPATH=users/src python3 -m pytest users/tests/unit -v
+        shell: bash
 
-      #- name: Run Integration Tests for users module
-      #  run: |
-      #    source test/bin/activate
-      #    PYTHONPATH=users/src python3 -m pytest users/tests/integration -v
-      #  shell: bash
+      - name: Run Integration Tests for users module
+        run: |
+          source test/bin/activate
+          PYTHONPATH=users/src python3 -m pytest users/tests/integration -v
+        shell: bash
 # odkomentuje jak zdebuguje testy dla integration 
-      #- name: Set up test environment for orders module
-      #  run: |
-      #    python -m venv test_orders
-      #    source test_orders/bin/activate
-      #    pip install -r orders/tests/requirements.txt
-      #  shell: bash
+      - name: Set up test environment for orders module
+        run: |
+          python -m venv test_orders
+          source test_orders/bin/activate
+          pip install -r orders/tests/requirements.txt
+        shell: bash
 
-      #- name: Run Integration Tests for orders module
-      #  run: |
-      #    source test_orders/bin/activate
-      #    PYTHONPATH=orders/src python3 -m pytest orders/tests/integration -v
-      #  shell: bash
+      - name: Run Integration Tests for orders module
+        run: |
+          source test_orders/bin/activate
+          PYTHONPATH=orders/src python3 -m pytest orders/tests/integration -v
+        shell: bash
 
   rollback:
     runs-on: ubuntu-latest
