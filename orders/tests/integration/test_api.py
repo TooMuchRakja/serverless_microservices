@@ -39,9 +39,61 @@ def orders_endpoint(global_config):
 @pytest.fixture
 def user_token(global_config):
   '''Returns the user_token for authentication to the Orders service'''
-  user_token = global_config["user1UserIdToken"]
+  user_token = global_config["user1AccessToken"]
   logger.debug("     User Token = " + user_token)
   return user_token
+
+@pytest.fixture
+def acknowledge_order_hook(global_config, orders_endpoint, user_token):
+    """Creates and acknowledges an order to simulate wrong status for cancellation."""
+    import uuid
+
+    order = {
+        "restaurantId": 1,
+        "orderId": str(uuid.uuid4()),
+        "orderItems": [
+            {
+                "id": 1,
+                "name": "Sushi",
+                "price": 14.99,
+                "quantity": 1
+            }
+        ],
+        "totalAmount": 14.99,
+        "status": "PLACED"
+    }
+
+    # Create the order
+    response = requests.post(
+        orders_endpoint,
+        data=json.dumps(order),
+        headers={'Authorization': user_token, 'Content-Type': 'application/json'}
+    )
+    assert response.status_code == 200
+    created_order = response.json()
+    order_id = created_order['orderId']
+    order_time = created_order['orderTime']
+
+    # Acknowledge the order (simulate order moving to next status)
+    acknowledge_payload = {
+        "restaurantId": 1,
+        "orderItems": order["orderItems"],
+        "totalAmount": 14.99,
+        "status": "ACKNOWLEDGED",
+        "orderTime": order_time
+    }
+
+    response = requests.put(
+        f"{orders_endpoint}/{order_id}",
+        data=json.dumps(acknowledge_payload),
+        headers={'Authorization': user_token, 'Content-Type': 'application/json'}
+    )
+    assert response.status_code == 200
+
+    # Save to config for later use
+    global_config["ackOrderId"] = order_id
+    return order_id
+
 
 
 def test_access_orders_without_authentication(orders_endpoint):

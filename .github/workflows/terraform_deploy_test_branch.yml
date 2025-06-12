@@ -180,7 +180,14 @@ jobs:
   # Odkomentuj gdy będziesz gotowy do faktycznego deployu
       - name: Terraform Apply
         id: apply
+        env:
+          TF_LOG: DEBUG
+          TF_LOG_PATH: ./terraform.log
         run: terraform apply -auto-approve tfplan
+        working-directory: .
+
+      - name: Show Terraform log output
+        run: cat ./terraform.log
         working-directory: .
 
       - name: Wait for resources to establish connections
