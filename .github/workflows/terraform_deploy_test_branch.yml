@@ -206,19 +206,18 @@ jobs:
           PYTHONPATH=users/src python3 -m pytest users/tests/integration -v
         shell: bash
 # odkomentuje jak zdebuguej testy
-      # ---- Testy modułu zamówień ----
-      #- name: Set up test environment for orders module
-      #  run: |
-      #    python -m venv test_orders
-      #    source test_orders/bin/activate
-      #    pip install -r orders/tests/requirements.txt
-      #  shell: bash
+      - name: Set up test environment for orders module
+        run: |
+          python -m venv test_orders
+          source test_orders/bin/activate
+          pip install -r orders/tests/requirements.txt
+        shell: bash
 
-      #- name: Run Integration Tests for orders module
-      #  run: |
-      #    source test_orders/bin/activate
-      #    PYTHONPATH=orders/src python3 -m pytest orders/tests/integration -v
-      #  shell: bash
+      - name: Run Integration Tests for orders module
+        run: |
+          source test_orders/bin/activate
+          PYTHONPATH=orders/src python3 -m pytest orders/tests/integration -v
+        shell: bash
 
   rollback:
     runs-on: ubuntu-latest

@@ -2,7 +2,7 @@ from boto3.dynamodb.conditions import Key
 import boto3
 import os
 
-orders_table = os.getenv('TABLE_NAME')
+orders_table = os.getenv('ORDERS_TABLE')
 dynamodb = boto3.resource('dynamodb')
 
 def get_order(user_id, order_id):
