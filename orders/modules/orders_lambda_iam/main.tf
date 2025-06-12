@@ -224,6 +224,8 @@ resource "aws_iam_policy" "get_order_function_policy" {
   "Statement": [
     {
       "Action": [
+        "dynamodb:Scan",
+        "dynamodb:Query",
         "dynamodb:GetItem",
         "dynamodb:DescribeTable"
       ],
