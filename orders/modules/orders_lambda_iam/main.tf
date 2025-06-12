@@ -163,6 +163,7 @@ resource "aws_iam_policy" "delete_order_function_policy" {
     {
       "Action": [
         "dynamodb:DeleteItem",
+        "dynamodb:UpdateItem",
         "dynamodb:Query",
         "dynamodb:GetItem",
         "dynamodb:ConditionCheckItem",
