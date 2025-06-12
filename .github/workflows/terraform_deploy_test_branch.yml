@@ -205,7 +205,7 @@ jobs:
           source test/bin/activate
           PYTHONPATH=users/src python3 -m pytest users/tests/integration -v
         shell: bash
-# odkomentuje jak zdebuguej testy
+# odkomentuje jak zdebuguje testy dla integration 
       - name: Set up test environment for orders module
         run: |
           python -m venv test_orders
