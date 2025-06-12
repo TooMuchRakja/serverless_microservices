@@ -96,6 +96,7 @@ resource "aws_iam_policy" "edit_order_function_policy" {
     {
       "Action": [
         "dynamodb:UpdateItem",
+        "dynamodb:Query",
         "dynamodb:GetItem",
         "dynamodb:ConditionCheckItem",
         "dynamodb:DescribeTable"
@@ -161,6 +162,7 @@ resource "aws_iam_policy" "delete_order_function_policy" {
     {
       "Action": [
         "dynamodb:DeleteItem",
+        "dynamodb:Query",
         "dynamodb:GetItem",
         "dynamodb:ConditionCheckItem",
         "dynamodb:DescribeTable"

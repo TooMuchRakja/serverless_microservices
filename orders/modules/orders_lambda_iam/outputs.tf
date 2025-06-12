@@ -3,7 +3,7 @@ output "add_order_function_role_arn" {
 } 
 
 output "edit_order_function_role_arn" {
-    value = aws_iam_role.add_order_function_role.arn
+    value = aws_iam_role.edit_order_function_role.arn
 }
 
 output "delete_order_function_role_arn" {
