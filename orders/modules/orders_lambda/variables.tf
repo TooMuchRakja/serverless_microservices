@@ -69,3 +69,13 @@ variable "python_version" {
 variable "region" {
   type    = string
 }
+
+variable "powertools_service_name" {
+  type    = string
+  default = "orders"
+}
+
+variable "powertools_namespace" {
+  type    = string
+  default = "serverless_workshop"
+}

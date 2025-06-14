@@ -27,6 +27,8 @@ resource "aws_lambda_function" "add_order_lambda" {
     variables = {
       ORDERS_TABLE = "${var.orders_dynamodb_table_name}"
       IDEMPOTENCY_TABLE_NAME = "${var.idempotence_dynamodb_table_name}"
+      POWERTOOLS_SERVICE_NAME = "${var.powertools_service_name}"
+      POWERTOOLS_METRICS_NAMESPACE = "${var.powertools_namespace}"
     }
   }
 }

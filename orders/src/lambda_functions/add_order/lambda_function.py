@@ -14,8 +14,8 @@ from aws_lambda_powertools.utilities.idempotency import (
     IdempotencyConfig, DynamoDBPersistenceLayer, idempotent_function
 )
 
-logger = Logger()
-metrics = Metrics()
+logger = Logger() 
+metrics = Metrics() # it will take POWERTOOLS_METRICS_NAMESPACE AUTOMATICALLY 
 orders_table = os.getenv('ORDERS_TABLE')
 idempotency_table = os.getenv('IDEMPOTENCY_TABLE_NAME')
 dynamodb = boto3.resource('dynamodb')
