@@ -1,4 +1,4 @@
-# w tym main nawiązujemy do podmodułów tworzących zasoby z modułu orders 
+
 module "orders_apigateway" {
   source     = "./modules/orders_apigateway"
   region     = var.region
