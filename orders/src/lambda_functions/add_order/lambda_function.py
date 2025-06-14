@@ -21,19 +21,39 @@ idempotency_table = os.getenv('IDEMPOTENCY_TABLE_NAME')
 dynamodb = boto3.resource('dynamodb')
 
 persistence_layer = DynamoDBPersistenceLayer(table_name=idempotency_table)
-idempotency_config = IdempotencyConfig(event_key_jmespath="powertools_json(body).orderId")
+idempotency_config = IdempotencyConfig(
+    event_key_jmespath="powertools_json(body).orderId",
+    payload_validation_jmespath="powertools_json(body)"
+)
 
 @idempotent_function(data_keyword_argument="event", config=idempotency_config, persistence_store=persistence_layer)
 def add_order(event: dict):
     logger.info("Adding a new order")
-    detail = json.loads(event['body'])
-    logger.info({"operation": "add_order", "order_details": detail})
-    restaurant_id = detail['restaurantId']
-    total_amount = detail['totalAmount']
-    order_items = detail['orderItems']
-    user_id = event['requestContext']['authorizer']['claims']['sub']
-    order_time = datetime.strftime(datetime.utcnow(), '%Y-%m-%dT%H:%M:%SZ')
-    order_id = detail['orderId']
+    try:
+        detail = json.loads(event['body'])
+        logger.info({"operation": "add_order", "order_details": detail})
+        restaurant_id = detail['restaurantId']
+        total_amount = detail['totalAmount']
+        order_items = detail['orderItems']
+        
+        # Handle both v1 and v2 API Gateway payload formats
+        if 'requestContext' in event and 'authorizer' in event['requestContext']:
+            authorizer = event['requestContext']['authorizer']
+            if 'jwt' in authorizer and 'claims' in authorizer['jwt']:
+                # API Gateway v2 format
+                user_id = authorizer['jwt']['claims']['sub']
+            elif 'claims' in authorizer:
+                # API Gateway v1 format
+                user_id = authorizer['claims']['sub']
+            else:
+                logger.error("Could not extract user ID from event")
+                raise ValueError("Missing user claims in request context")
+        else:
+            logger.error("Missing request context or authorizer")
+            raise ValueError("Missing request context or authorizer")
+            
+        order_time = datetime.strftime(datetime.utcnow(), '%Y-%m-%dT%H:%M:%SZ')
+        order_id = detail['orderId']
 
     ddb_item = {
         'orderId': order_id,
@@ -59,22 +79,37 @@ def add_order(event: dict):
     metrics.add_metric(name="OrderTotal", unit=MetricUnit.Count, value=total_amount) #OrderTotal
 
     detail['orderId'] = order_id
+    detail['userId'] = user_id
     detail['status'] = 'PLACED'
+    detail['orderTime'] = order_time
 
     return detail
 
 @metrics.log_metrics  # ensures metrics are flushed upon request completion/failure
 @logger.inject_lambda_context
 def lambda_handler(event, context: LambdaContext):
-    idempotency_config.register_lambda_context(context)
     """Handles the lambda method invocation"""
+    idempotency_config.register_lambda_context(context)
+    
     try:
+        # Log the incoming event for debugging
+        logger.debug(f"Received event: {json.dumps(event)}")
+        
         order_detail = add_order(event=event)
         response = {
             "statusCode": 200,
-            "headers": {},
+            "headers": {
+                "Content-Type": "application/json"
+            },
             "body": json.dumps(order_detail)
         }
         return response
     except Exception as err:
-        raise
+        logger.exception(f"Error processing order: {str(err)}")
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps({"error": str(err)})
+        }
