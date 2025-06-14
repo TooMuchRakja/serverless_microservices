@@ -24,7 +24,7 @@ idempotency_table = os.getenv('IDEMPOTENCY_TABLE_NAME')
 # DynamoDB client
 dynamodb = boto3.resource('dynamodb')
 
-# Idempotency setup
+# Idempotency setup python power tools 
 persistence_layer = DynamoDBPersistenceLayer(table_name=idempotency_table)
 idempotency_config = IdempotencyConfig(
     event_key_jmespath="orderId"  # zakładamy, że orderId jest w detail
