@@ -63,7 +63,7 @@ variable "list_order_function_role_arn" {
 
 variable "python_version" {
   type    = string
-  default = "310"
+  default = "python310"
 }
 
 variable "region" {
