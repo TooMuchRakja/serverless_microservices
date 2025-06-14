@@ -5,12 +5,29 @@ import json
 import uuid
 from datetime import datetime
 
-# Globals
+from aws_lambda_powertools import Logger, Metrics
+from aws_lambda_powertools.metrics import MetricUnit
+
+from aws_lambda_powertools import Logger
+from aws_lambda_powertools.utilities.typing import LambdaContext
+from aws_lambda_powertools.utilities.idempotency import (
+    IdempotencyConfig, DynamoDBPersistenceLayer, idempotent_function
+)
+
+logger = Logger()
+metrics = Metrics()
 orders_table = os.getenv('ORDERS_TABLE')
+idempotency_table = os.getenv('IDEMPOTENCY_TABLE_NAME')
 dynamodb = boto3.resource('dynamodb')
 
+persistence_layer = DynamoDBPersistenceLayer(table_name=idempotency_table)
+idempotency_config = IdempotencyConfig(event_key_jmespath="powertools_json(body).orderId")
+
+@idempotent_function(data_keyword_argument="event", config=idempotency_config, persistence_store=persistence_layer)
 def add_order(event: dict):
+    logger.info("Adding a new order")
     detail = json.loads(event['body'])
+    logger.info({"operation": "add_order", "order_details": detail})
     restaurant_id = detail['restaurantId']
     total_amount = detail['totalAmount']
     order_items = detail['orderItems']
@@ -37,14 +54,19 @@ def add_order(event: dict):
     # We must use conditional expression, otherwise put_item will always replace the original order and will never fail
     table.put_item(Item=ddb_item, ConditionExpression='attribute_not_exists(orderId) AND attribute_not_exists(userId)')
 
+    logger.info(f"new Order with ID {order_id} saved")
+    metrics.add_metric(name="SuccessfulOrder", unit=MetricUnit.Count, value=1)      #SuccessfulOrder
+    metrics.add_metric(name="OrderTotal", unit=MetricUnit.Count, value=total_amount) #OrderTotal
+
     detail['orderId'] = order_id
-    detail['orderTime'] = order_time
     detail['status'] = 'PLACED'
 
     return detail
 
-
-def lambda_handler(event, context):
+@metrics.log_metrics  # ensures metrics are flushed upon request completion/failure
+@logger.inject_lambda_context
+def lambda_handler(event, context: LambdaContext):
+    idempotency_config.register_lambda_context(context)
     """Handles the lambda method invocation"""
     try:
         order_detail = add_order(event=event)

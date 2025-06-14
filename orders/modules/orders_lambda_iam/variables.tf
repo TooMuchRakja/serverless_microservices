@@ -26,3 +26,7 @@ variable "region" {
     type = string
 }
 
+variable "idempotence_dynamodb_table_name" {
+    type = string
+}
+

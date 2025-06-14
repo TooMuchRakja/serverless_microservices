@@ -37,6 +37,10 @@ variable "orders_dynamodb_table_name" {
   type    = string
 }
 
+variable "idempotence_dynamodb_table_name" {
+  type    = string
+}
+
 variable "add_order_function_role_arn" {
   type    = string
 }
@@ -57,3 +61,11 @@ variable "list_order_function_role_arn" {
   type    = string
 }
 
+variable "python_version" {
+  type    = string
+  default = "310"
+}
+
+variable "region" {
+  type    = string
+}

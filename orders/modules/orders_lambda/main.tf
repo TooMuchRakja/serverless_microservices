@@ -15,7 +15,8 @@ resource "aws_lambda_function" "add_order_lambda" {
   runtime          = var.lambda_runtime
   memory_size      = var.lambda_memory
   timeout          = var.lambda_timeout
-  layers           = [aws_lambda_layer_version.requirements_layer.arn] # tutaj dodajemy layer z requirements bez get order
+  layers           = [aws_lambda_layer_version.requirements_layer.arn,
+                      "arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:7"] # NAZEWNICTWO LAMBDA LAYERA JAK Z DOKUMENTACJI 
 
   s3_bucket = local.lambda_code_bucket
   s3_key    = "add_order_function.zip"
@@ -26,6 +27,7 @@ resource "aws_lambda_function" "add_order_lambda" {
   environment {
     variables = {
       ORDERS_TABLE = "${var.orders_dynamodb_table_name}"
+      IDEMPOTENCY_TABLE_NAME = "${var.idempotence_dynamodb_table_name}"
     }
   }
 }
@@ -39,7 +41,8 @@ resource "aws_lambda_function" "edit_order_lambda" {
   runtime          = var.lambda_runtime
   memory_size      = var.lambda_memory
   timeout          = var.lambda_timeout
-  layers           = [aws_lambda_layer_version.requirements_layer.arn, aws_lambda_layer_version.get_order_layer.arn]
+  layers           = [aws_lambda_layer_version.requirements_layer.arn, aws_lambda_layer_version.get_order_layer.arn, 
+                      "arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:7"]
 
   s3_bucket = local.lambda_code_bucket
   s3_key    = "edit_order_function.zip"
@@ -62,7 +65,8 @@ resource "aws_lambda_function" "delete_order_lambda" {
   runtime          = var.lambda_runtime
   memory_size      = var.lambda_memory
   timeout          = var.lambda_timeout
-  layers           = [aws_lambda_layer_version.requirements_layer.arn, aws_lambda_layer_version.get_order_layer.arn] # tutaj dodajemy layer z requirements i get order
+  layers           = [aws_lambda_layer_version.requirements_layer.arn, aws_lambda_layer_version.get_order_layer.arn, 
+                      "arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:7"]
 
 
   s3_bucket = local.lambda_code_bucket
@@ -86,7 +90,8 @@ resource "aws_lambda_function" "get_order_lambda" {
   runtime          = var.lambda_runtime
   memory_size      = var.lambda_memory
   timeout          = var.lambda_timeout
-  layers           = [aws_lambda_layer_version.requirements_layer.arn, aws_lambda_layer_version.get_order_layer.arn]
+  layers           = [aws_lambda_layer_version.requirements_layer.arn, aws_lambda_layer_version.get_order_layer.arn, 
+                      "arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:7"]
 
   s3_bucket = local.lambda_code_bucket
   s3_key    = "get_order_function.zip"

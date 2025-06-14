@@ -31,11 +31,14 @@ resource "aws_iam_policy" "add_order_function_policy" {
     {
       "Action": [
         "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:GetItem",
         "dynamodb:DescribeTable",
         "dynamodb:ConditionCheckItem"
       ],
       "Effect": "Allow",
-      "Resource": "arn:*:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.orders_dynamodb_table_name}"
+      "Resource": ["arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.orders_dynamodb_table_name}", 
+                   "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.idempotence_dynamodb_table_name}"]
     },
     {
       "Action": [

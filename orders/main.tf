@@ -20,17 +20,19 @@ module "orders_dynamodb" {
 
 module "orders_lambda" {
   source                   = "./modules/orders_lambda"
+  region                  = var.region
   add_order_function_name = var.add_order_function_name
   edit_order_function_name = var.edit_order_function_name
   delete_order_function_name = var.delete_order_function_name
   get_order_function_name = var.get_order_function_name
   list_order_function_name = var.list_order_function_name
-  orders_dynamodb_table_name = module.orders_dynamodb.orders_dynamodb_table_name
   add_order_function_role_arn = module.orders_lambda_iam.add_order_function_role_arn
   edit_order_function_role_arn = module.orders_lambda_iam.edit_order_function_role_arn
   delete_order_function_role_arn = module.orders_lambda_iam.delete_order_function_role_arn
   get_order_function_role_arn = module.orders_lambda_iam.get_order_function_role_arn
   list_order_function_role_arn = module.orders_lambda_iam.list_order_function_role_arn
+  orders_dynamodb_table_name = module.orders_dynamodb.orders_dynamodb_table_name
+  idempotence_dynamodb_table_name = module.orders_dynamodb.idempotence_dynamodb_table_name
 
 }
 
@@ -43,6 +45,7 @@ module "orders_lambda_iam" {
   get_order_function_name = var.get_order_function_name
   list_order_function_name = var.list_order_function_name
   orders_dynamodb_table_name = module.orders_dynamodb.orders_dynamodb_table_name
+  idempotence_dynamodb_table_name = module.orders_dynamodb.idempotence_dynamodb_table_name
 }
 
 module "orders_api_iam" {
