@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 from decimal import Decimal
 from utils import get_order
 
-# Globals
+# Globals env
 order_table = os.getenv('ORDERS_TABLE')
 dynamodb = boto3.resource('dynamodb')
 
