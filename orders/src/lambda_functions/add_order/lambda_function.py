@@ -81,7 +81,7 @@ def add_order(detail: dict, event: dict):
     table = dynamodb.Table(orders_table)
     table.put_item(
         Item=ddb_item,
-        ConditionExpression='attribute_not_exists(orderId) AND attribute_not_exists(userId)'
+        ConditionExpression='attribute_not_exists(orderId)'
     )
 
     logger.info(f"New order with ID {order_id} saved")
