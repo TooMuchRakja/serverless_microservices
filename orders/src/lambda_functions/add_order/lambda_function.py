@@ -28,13 +28,12 @@ dynamodb = boto3.resource('dynamodb')
 # Idempotency setup
 persistence_layer = DynamoDBPersistenceLayer(table_name=idempotency_table)
 idempotency_config = IdempotencyConfig(
-    event_key_jmespath="body.orderId",
-    payload_validation_jmespath="body"
+    event_key_jmespath="body.orderId"
 )
 
 
-@idempotent_function(data_keyword_argument="event", config=idempotency_config, persistence_store=persistence_layer)
-def add_order(event: dict):
+@idempotent_function(data_keyword_argument="detail", config=idempotency_config, persistence_store=persistence_layer)
+def add_order(detail: dict, event: dict):
     logger.info("Adding a new order")
     
     detail = json.loads(event['body'])
@@ -106,7 +105,8 @@ def lambda_handler(event, context: LambdaContext):
 
     try:
         logger.debug(f"Received event: {json.dumps(event)}")
-        order_detail = add_order(event=event)
+        body = json.loads(event.get("body", "{}"))
+        order_detail = add_order(detail=body, event=event)
 
         return {
             "statusCode": 200,
