@@ -13,6 +13,9 @@ from aws_lambda_powertools.utilities.idempotency import (
     DynamoDBPersistenceLayer,
     idempotent_function
 )
+from aws_lambda_powertools.utilities.jmespath_utils import (
+    PowertoolsFunctions
+)
 
 # Logger and metrics setup
 logger = Logger()
@@ -25,11 +28,15 @@ idempotency_table = os.getenv('IDEMPOTENCY_TABLE_NAME')
 # DynamoDB client
 dynamodb = boto3.resource('dynamodb')
 
+# Register custom JMESPath functions
+jmespath_options = {"custom_functions": PowertoolsFunctions()}
+
 # Idempotency setup
 persistence_layer = DynamoDBPersistenceLayer(table_name=idempotency_table)
 idempotency_config = IdempotencyConfig(
-    event_key_jmespath="powertools_json(body).orderId",
-    payload_validation_jmespath="powertools_json(body)"
+    event_key_jmespath="body | parse_json(@).orderId",
+    payload_validation_jmespath="body | parse_json(@)",
+    jmespath_options=jmespath_options
 )
 
 
