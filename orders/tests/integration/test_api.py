@@ -4,6 +4,7 @@ import logging
 import time
 import uuid
 import pytest
+import boto3
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
