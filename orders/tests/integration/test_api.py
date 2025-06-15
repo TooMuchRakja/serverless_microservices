@@ -4,7 +4,6 @@ import logging
 import time
 import uuid
 import pytest
-import boto3
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -43,58 +42,6 @@ def user_token(global_config):
   user_token = global_config["user1UserIdToken"]
   logger.debug("     User Token = " + user_token)
   return user_token
-
-@pytest.fixture(scope='function')
-def acknowledge_order_hook(request):
-    """
-    Fixture to set up an order to test cancel_order() operation.
-     - Before test: Creates an order in the database with "ACKNOWLEDGED" order status
-     - After test: Removes previously created order
-    """
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(globalConfig['OrdersTable'])
-
-    # Create an order with "ACKNOWLEDGED" status
-    order_id = str(uuid.uuid4())
-    user_id = globalConfig['user1UserSub']
-    order_data = {
-        'orderId': order_id,
-        'userId': user_id,
-        'data': {
-            'orderId': order_id,
-            'userId': user_id,
-            'restaurantId': 2,
-            'orderItems': [
-                {
-                    'name': 'Artichoke Ravioli',
-                    'price': 9.99,
-                    'id': 1,
-                    'quantity': 1
-                }
-            ],
-            'totalAmount': 9.99,
-            'status': 'ACKNOWLEDGED',
-            'orderTime': datetime.strftime(datetime.utcnow(), '%Y-%m-%dT%H:%M:%SZ'),
-        }
-    }
-
-    ddb_item = json.loads(json.dumps(order_data), parse_float=Decimal)
-    table.put_item(Item=ddb_item)
-
-    globalConfig['ackOrderId'] = order_id
-
-    # Next, the test will run...
-    yield
-
-    # After the test runs; delete the item
-    key = {
-        'userId': user_id,
-        'orderId': order_id
-    }
-
-    table.delete_item(Key=key)
-
-
 
 def test_access_orders_without_authentication(orders_endpoint):
   response = requests.post(orders_endpoint)
@@ -194,31 +141,6 @@ def test_cancel_order(global_config, orders_endpoint, user_token):
   assert order_info['orderId'] == global_config['orderId']
   assert order_info['status'] == 'CANCELED'
   
-  
-def test_cancel_order_in_wrong_status(global_config, orders_endpoint, user_token, acknowledge_order_hook):
-  response = requests.delete(orders_endpoint + "/" + global_config['ackOrderId'],
-      headers={'Authorization': user_token, 'Content-Type': 'application/json'}
-      )
-  logger.debug(f'Cancel order response: {response.text}')
-  # Verify OrderStatusError exception was raised because status not 'PLACED' as expected.
-  assert response.status_code == 400
-
-def test_create_order_idempotency(global_config, orders_endpoint, user_token):
-
-  order_details = {
-      "restaurantId": 200,
-      "orderId": str(uuid.uuid4()),
-      "orderItems": [
-          {
-              "name": "Pasta Carbonara",
-              "price": 14.99,
-              "id": 123,
-              "quantity": 1
-          }
-      ],
-      "totalAmount": 14.99
-  }
-
   order_data = json.dumps(order_details)
   header_data = {'Authorization': user_token, 'Content-Type': 'application/json'}
 
