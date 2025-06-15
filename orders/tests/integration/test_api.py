@@ -141,6 +141,25 @@ def test_cancel_order(global_config, orders_endpoint, user_token):
   assert order_info['orderId'] == global_config['orderId']
   assert order_info['status'] == 'CANCELED'
   
+  
+
+
+def test_create_order_idempotency(global_config, orders_endpoint, user_token):
+
+  order_details = {
+      "restaurantId": 200,
+      "orderId": str(uuid.uuid4()),
+      "orderItems": [
+          {
+              "name": "Pasta Carbonara",
+              "price": 14.99,
+              "id": 123,
+              "quantity": 1
+          }
+      ],
+      "totalAmount": 14.99
+  }
+
   order_data = json.dumps(order_details)
   header_data = {'Authorization': user_token, 'Content-Type': 'application/json'}
 
