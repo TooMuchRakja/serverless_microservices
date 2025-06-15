@@ -43,56 +43,55 @@ def user_token(global_config):
   logger.debug("     User Token = " + user_token)
   return user_token
 
-@pytest.fixture
-def acknowledge_order_hook(global_config, orders_endpoint, user_token):
-    """Creates and acknowledges an order to simulate wrong status for cancellation."""
-    import uuid
+@pytest.fixture(scope='function')
+def acknowledge_order_hook(request):
+    """
+    Fixture to set up an order to test cancel_order() operation.
+     - Before test: Creates an order in the database with "ACKNOWLEDGED" order status
+     - After test: Removes previously created order
+    """
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(globalConfig['OrdersTable'])
 
-    order = {
-        "restaurantId": 1,
-        "orderId": str(uuid.uuid4()),
-        "orderItems": [
-            {
-                "id": 1,
-                "name": "Sushi",
-                "price": 14.99,
-                "quantity": 1
-            }
-        ],
-        "totalAmount": 14.99,
-        "status": "PLACED"
+    # Create an order with "ACKNOWLEDGED" status
+    order_id = str(uuid.uuid4())
+    user_id = globalConfig['user1UserSub']
+    order_data = {
+        'orderId': order_id,
+        'userId': user_id,
+        'data': {
+            'orderId': order_id,
+            'userId': user_id,
+            'restaurantId': 2,
+            'orderItems': [
+                {
+                    'name': 'Artichoke Ravioli',
+                    'price': 9.99,
+                    'id': 1,
+                    'quantity': 1
+                }
+            ],
+            'totalAmount': 9.99,
+            'status': 'ACKNOWLEDGED',
+            'orderTime': datetime.strftime(datetime.utcnow(), '%Y-%m-%dT%H:%M:%SZ'),
+        }
     }
 
-    # Create the order
-    response = requests.post(
-        orders_endpoint,
-        data=json.dumps(order),
-        headers={'Authorization': user_token, 'Content-Type': 'application/json'}
-    )
-    assert response.status_code == 200
-    created_order = response.json()
-    order_id = created_order['orderId']
-    order_time = created_order['orderTime']
+    ddb_item = json.loads(json.dumps(order_data), parse_float=Decimal)
+    table.put_item(Item=ddb_item)
 
-    # Acknowledge the order (simulate order moving to next status)
-    acknowledge_payload = {
-        "restaurantId": 1,
-        "orderItems": order["orderItems"],
-        "totalAmount": 14.99,
-        "status": "ACKNOWLEDGED",
-        "orderTime": order_time
+    globalConfig['ackOrderId'] = order_id
+
+    # Next, the test will run...
+    yield
+
+    # After the test runs; delete the item
+    key = {
+        'userId': user_id,
+        'orderId': order_id
     }
 
-    response = requests.put(
-        f"{orders_endpoint}/{order_id}",
-        data=json.dumps(acknowledge_payload),
-        headers={'Authorization': user_token, 'Content-Type': 'application/json'}
-    )
-    assert response.status_code == 200
-
-    # Save to config for later use
-    global_config["ackOrderId"] = order_id
-    return order_id
+    table.delete_item(Key=key)
 
 
 

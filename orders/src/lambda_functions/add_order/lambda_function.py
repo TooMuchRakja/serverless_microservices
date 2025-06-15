@@ -1,6 +1,7 @@
 import os
 import boto3
 import json
+import uuid
 from decimal import Decimal
 from datetime import datetime
 
@@ -24,23 +25,24 @@ idempotency_table = os.getenv('IDEMPOTENCY_TABLE_NAME')
 # DynamoDB client
 dynamodb = boto3.resource('dynamodb')
 
-# Idempotency setup python power tools 
+# Idempotency setup
 persistence_layer = DynamoDBPersistenceLayer(table_name=idempotency_table)
 idempotency_config = IdempotencyConfig(
-    event_key_jmespath="orderId"  # zakładamy, że orderId jest w detail
+    event_key_jmespath="body.orderId"
 )
 
-@idempotent_function(data_keyword_argument="detail", config=idempotency_config, persistence_store=persistence_layer)
-def add_order(detail: dict):
+
+@idempotent_function(data_keyword_argument="event", config=idempotency_config, persistence_store=persistence_layer)
+def add_order(event: dict):
     logger.info("Adding a new order")
     logger.info({"operation": "add_order", "order_details": detail})
-
-    order_id = detail['orderId']
-    user_id = detail['userId']  # zakładamy, że to pole jest przesyłane
+    detail = json.loads(event['body'])
     restaurant_id = detail['restaurantId']
     total_amount = detail['totalAmount']
     order_items = detail['orderItems']
-    order_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    user_id =  event['requestContext']['authorizer']['claims']['sub']
+    order_time = datetime.strftime(datetime.utcnow(), '%Y-%m-%dT%H:%M:%SZ')
+    order_id = detail['orderId']
 
     # Prepare DynamoDB item
     ddb_item = {
@@ -69,35 +71,29 @@ def add_order(detail: dict):
     metrics.add_metric(name="OrderTotal", unit=MetricUnit.Count, value=total_amount)
 
     # Augment response
+    detail['orderId'] = order_id
+    detail['userId'] = user_id
     detail['status'] = 'PLACED'
     detail['orderTime'] = order_time
 
     return detail
 
-@metrics.log_metrics
+
+@metrics.log_metrics  # ensures metrics are flushed upon request completion/failure
 @logger.inject_lambda_context
 def lambda_handler(event, context: LambdaContext):
+    """Handles the Lambda method invocation"""
     idempotency_config.register_lambda_context(context)
 
     try:
         logger.debug(f"Received event: {json.dumps(event)}")
-        body = json.loads(event.get("body", "{}"))
-        order_detail = add_order(detail=body)
+        order_detail = add_order(event=event)
 
-        return {
+        response = {
             "statusCode": 200,
-            "headers": {
-                "Content-Type": "application/json"
-            },
+            "headers": {},
             "body": json.dumps(order_detail)
         }
-
+        return response
     except Exception as err:
-        logger.exception(f"Error processing order: {str(err)}")
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Content-Type": "application/json"
-            },
-            "body": json.dumps({"error": str(err)})
-        }
+        raise
