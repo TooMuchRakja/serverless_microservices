@@ -18,7 +18,7 @@ from aws_lambda_powertools.utilities.idempotency import (
 logger = Logger()
 metrics = Metrics()
 
-# Environment variables
+# Environment variables ..
 orders_table = os.getenv('ORDERS_TABLE')
 idempotency_table = os.getenv('IDEMPOTENCY_TABLE_NAME')
 
