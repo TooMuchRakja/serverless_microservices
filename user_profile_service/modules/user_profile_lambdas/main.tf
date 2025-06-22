@@ -76,7 +76,7 @@ resource "aws_lambda_function" "list_address_function" {
     
   function_name = "${var.stack_name}_list_address_function"
   description   = "Lambda function which returns addresses from dynamodb address table"
-  role          =  var.delete_address_role_arn # do zmiany 
+  role          =  var.list_address_role_arn
   handler       = "lambda_function.lambda_handler"
   runtime       = var.lambda_runtime
   memory_size   = var.memory_size

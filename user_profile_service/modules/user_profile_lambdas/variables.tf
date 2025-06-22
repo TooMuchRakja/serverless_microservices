@@ -41,3 +41,7 @@ variable "edit_address_role_arn" {
 variable "delete_address_role_arn" {
   type = string
 }
+
+variable "list_address_role_arn" {
+  type = string
+}
