@@ -50,7 +50,6 @@ module "user_profile_api"  {
   edit_address_function_arn  = module.user_profile_lambdas.edit_address_function_arn
   delete_address_function_arn =  module.user_profile_lambdas.delete_address_function_arn
   list_address_function_arn = module.user_profile_lambdas.list_address_function_arn
-  global_api_logging_role = var.global_api_logging_role
   aws_api_gateway_account_settings = var.aws_api_gateway_account_settings
   address_bus_name = module.user_profile_event_bridge_bus.address_bus_name
 }

@@ -26,10 +26,6 @@ variable "list_address_function_arn" {
   type = string
 }
 
-variable "global_api_logging_role" {
-  type = string
-}
-
 variable "aws_api_gateway_account_settings" {
   type = any
 }
