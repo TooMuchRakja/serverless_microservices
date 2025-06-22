@@ -45,3 +45,10 @@ output "orders_api_endpoint_url" {
     value = module.orders.orders_api_endpoint_url
 }
 
+output "Address_Table" {
+    value = module.user_profile_service.address_table_name
+}
+
+output "address_api_endpoint_url" {
+    value = module.user_profile_service.address_api_endpoint_url
+}

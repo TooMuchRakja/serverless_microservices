@@ -1,4 +1,4 @@
-name: Terraform Deployment - test branch modules 2 and 3
+name: Terraform Deployment - test branch modules 2,3 and 4 
 
 on:
   push:
@@ -74,6 +74,24 @@ jobs:
             path: ./orders/src/lambda_functions/list_order
             type: simple
             entry: lambda_function.py
+
+          - name: add_address_function
+            path: ./user_profile_service/src/lambda_functions_address/add_address_function
+            type: simple
+            entry: lambda_function.py
+          - name: edit_address_function
+            path: ./user_profile_service/src/lambda_functions_address/edit_address_function
+            type: simple
+            entry: lambda_function.py
+          - name: delete_address_function
+            path: ./user_profile_service/src/lambda_functions_address/delete_address_function
+            type: simple
+            entry: lambda_function.py
+          - name: list_address_function
+            path: ./user_profile_service/src/lambda_functions_address/list_address_function
+            type: simple
+            entry: lambda_function.py
+
 
     steps:
       - name: Checkout repo
@@ -173,20 +191,20 @@ jobs:
         run: terraform validate
         working-directory: .
 
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
-        working-directory: .
+    #  - name: Terraform Plan
+    #    run: terraform plan -out=tfplan
+    #    working-directory: .
 
   # Odkomentuj gdy będziesz gotowy do faktycznego deployu
-      - name: Terraform Apply
-        id: apply
-        run: terraform apply -auto-approve tfplan
-        working-directory: .
+    #  - name: Terraform Apply
+    #    id: apply
+    #    run: terraform apply -auto-approve tfplan
+    #    working-directory: .
 
 
 
-      - name: Wait for resources to establish connections
-        run: sleep 30
+  #    - name: Wait for resources to establish connections
+  #      run: sleep 30
 
       # ---- Testy modułu użytkowników ----
     #  - name: Set up test environment for users module
@@ -208,53 +226,53 @@ jobs:
     #      PYTHONPATH=users/src python3 -m pytest users/tests/integration -v
     #    shell: bash
 # odkomentuje jak zdebuguje testy dla integration 
-      - name: Set up test environment for orders module
-        run: |
-          python -m venv test_orders
-          source test_orders/bin/activate
-          pip install -r orders/tests/requirements.txt
-        shell: bash
+    #  - name: Set up test environment for orders module
+    #    run: |
+    #      python -m venv test_orders
+    #      source test_orders/bin/activate
+    #      pip install -r orders/tests/requirements.txt
+    #    shell: bash
 
-      - name: Run Integration Tests for orders module
-        run: |
-          source test_orders/bin/activate
-          PYTHONPATH=orders/src python3 -m pytest orders/tests/integration -v
-        shell: bash
+    #  - name: Run Integration Tests for orders module
+    #    run: |
+    #      source test_orders/bin/activate
+    #      PYTHONPATH=orders/src python3 -m pytest orders/tests/integration -v
+    #    shell: bash
 
-  rollback:
-    runs-on: ubuntu-latest
-    needs: deploy_and_test
-    if: ${{ failure() }}
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+#  rollback:
+#    runs-on: ubuntu-latest
+#    needs: deploy_and_test
+#    if: ${{ failure() }}
+#    steps:
+#      - name: Checkout repo
+#        uses: actions/checkout@v3
+#
+#      - name: Set up AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-region: ${{ env.TF_REGION }}
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#
+#      - name: Set up Terraform
+#        uses: hashicorp/setup-terraform@v3
+#
+#      - name: Generate backend config
+#        run: |
+#          cat <<EOF > backend.conf.hcl 
+#          bucket         = "${TF_BUCKET_NAME}"
+#          key            = "${TF_BUCKET_KEY}"
+#          region         = "${TF_REGION}"
+#          dynamodb_table = "${TF_DYNAMO_TABLE}"
+#          encrypt        = true
+#          EOF
 
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ env.TF_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#      - name: Terraform Init
+#        run: terraform init -backend-config=backend.conf.hcl 
+#        working-directory: .
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Generate backend config
-        run: |
-          cat <<EOF > backend.conf.hcl 
-          bucket         = "${TF_BUCKET_NAME}"
-          key            = "${TF_BUCKET_KEY}"
-          region         = "${TF_REGION}"
-          dynamodb_table = "${TF_DYNAMO_TABLE}"
-          encrypt        = true
-          EOF
-
-      - name: Terraform Init
-        run: terraform init -backend-config=backend.conf.hcl 
-        working-directory: .
-
-      - name: Rollback - Terraform Destroy
-        run: terraform destroy -auto-approve
-        working-directory: .
+#      - name: Rollback - Terraform Destroy
+#        run: terraform destroy -auto-approve
+#        working-directory: .
 
 

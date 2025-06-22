@@ -39,3 +39,10 @@ resource "aws_cloudwatch_log_group" "orders_api_access_logs" {
 
   depends_on = [aws_iam_role.api_logging_role]
 }
+
+resource "aws_cloudwatch_log_group" "address_api_access_logs" {
+  name              = "/${var.api_account_name}/address_api_logs"
+  retention_in_days = 30
+
+  depends_on = [aws_iam_role.api_logging_role]
+}
