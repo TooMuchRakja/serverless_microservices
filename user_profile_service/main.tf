@@ -2,8 +2,6 @@
 
 module "user_profile_dynamodb" {
   source = "./modules/user_profile_dynamodb"
-  region = var.region
-  stack_name = var.stack_name
 }
 
 module "user_profile_event_bridge_bus" {
