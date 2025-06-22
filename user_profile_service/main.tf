@@ -33,7 +33,6 @@ module "user_profile_lambdas" {
 module "user_profile_lambda_iam" {
   source = "./modules/user_profile_lambda_iam"
   region = var.region
-  stack_name = var.stack_name
   add_address_function_name = module.user_profile_lambdas.add_address_function_name
   edit_address_function_name = module.user_profile_lambdas.edit_address_function_name
   delete_address_function_name = module.user_profile_lambdas.delete_address_function_name
