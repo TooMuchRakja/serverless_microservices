@@ -1,24 +1,24 @@
-variables "stack_name" {
+variable "stack_name" {
     type = string
 }
 
-variables "region" {
+variable "region" {
     type = string
 }
 
-variables "add_address_function_arn" {
+variable "add_address_function_arn" {
     type = string
 }
 
-variables "edit_address_function_arn" {
+variable "edit_address_function_arn" {
     type = string
 }
 
-variables "delete_address_function_arn" {
+variable "delete_address_function_arn" {
     type = string
 }
 
-variables "list_address_function_arn" {
+variable "list_address_function_arn" {
     type = string
 }
 
