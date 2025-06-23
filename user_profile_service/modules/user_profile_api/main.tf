@@ -301,7 +301,6 @@ resource "aws_iam_role" "address_api_role" {
 
 resource "aws_iam_policy" "address_api_role_policy" {
   name = "address_api_role_policy"
-  role = aws_iam_role.address_api_role.name
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -319,5 +318,5 @@ resource "aws_iam_policy" "address_api_role_policy" {
 
 resource "aws_iam_role_policy_attachment" "address_api_attachment" {
   role       = aws_iam_role.address_api_role.name
-  policy_arn = aws_iam_policy.address_api_policy.arn
+  policy_arn = aws_iam_policy.address_api_role_policy.arn
 }

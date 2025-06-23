@@ -31,7 +31,7 @@ resource "aws_lambda_permission" "allow_invoke_delete_address_lambda" {
 # DEFINE EVENT FOR ADD  ADDRESS FUNCTION 
 resource "aws_cloudwatch_event_rule" "bus_address_added" {
   name           = "${var.stack_name}_address_added"
-  event_bus_name = var.event_bridge_bus_name
+  event_bus_name = aws_cloudwatch_event_bus.address_bus.name
   event_pattern = jsonencode({
     "source": ["customer-profile"],
     "detail-type": ["address.added"]
@@ -49,7 +49,7 @@ resource "aws_cloudwatch_event_target" "invoke_add_address_lambda" {
 # DEFINE EVENT FOR EDIT ADDRESS FUNCTION
 resource "aws_cloudwatch_event_rule" "bus_address_edited" {
   name           = "${var.stack_name}_address_edited"
-  event_bus_name = var.event_bridge_bus_name
+  event_bus_name = aws_cloudwatch_event_bus.address_bus.name
   event_pattern = jsonencode({
     "source": ["customer-profile"],
     "detail-type": ["address.updated"]
@@ -66,7 +66,7 @@ resource "aws_cloudwatch_event_target" "invoke_edited_address_lambda" {
 # ZDEFINIOWAĆ RULE, TARGET ORAZ INWOKACJE DLA DELETE 
 resource "aws_cloudwatch_event_rule" "bus_address_deleted" {
   name           = "${var.stack_name}_address_deleted"
-  event_bus_name = var.event_bridge_bus_name
+  event_bus_name = aws_cloudwatch_event_bus.address_bus.name
   event_pattern = jsonencode({
     "source": ["customer-profile"],
     "detail-type": ["address.deleted"]

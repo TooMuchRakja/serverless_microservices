@@ -18,7 +18,7 @@ resource "aws_lambda_function" "add_address_function" {
   layers        = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:12"]
 
   s3_bucket = local.lambda_code_bucket
-  s3_key    = add_address_function.zip
+  s3_key    = "add_address_function.zip" # s3 key zawsze musi być w cudzysłowiu 
 
   environment {
     variables = {
@@ -40,7 +40,7 @@ resource "aws_lambda_function" "edit_address_function" {
   layers        = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:12"]
 
   s3_bucket = local.lambda_code_bucket
-  s3_key    = edit_address_function.zip
+  s3_key    = "edit_address_function.zip" # s3 key zawsze musi być w cudzysłowiu 
 
   environment {
     variables = {
@@ -62,7 +62,7 @@ resource "aws_lambda_function" "delete_address_function" {
   layers        = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:12"]
 
   s3_bucket = local.lambda_code_bucket
-  s3_key    = delete_address_function.zip
+  s3_key    = "delete_address_function.zip" # s3 key zawsze musi być w cudzysłowiu 
 
   environment {
     variables = {
@@ -84,7 +84,7 @@ resource "aws_lambda_function" "list_address_function" {
   layers        = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:12"]
 
   s3_bucket = local.lambda_code_bucket
-  s3_key    = list_address_function.zip
+  s3_key    = "list_address_function.zip" # s3 key zawsze musi być w cudzysłowiu 
 
   environment {
     variables = {

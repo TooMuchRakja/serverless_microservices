@@ -135,7 +135,7 @@ resource "aws_iam_policy_attachment" "edit_address_function_attach" {
 
 
 # DELETE ADDRESS ROLE AND POLICY 
-resource "aws_iam_role" "delete_address_function_name" {
+resource "aws_iam_role" "delete_address_function_role" {
   name = "${var.delete_address_function_name}-role"
   description = "Delete address Lambda function IAM role"
   assume_role_policy = <<EOF
