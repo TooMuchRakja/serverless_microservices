@@ -2,7 +2,7 @@ resource "aws_cloudwatch_event_bus" "address_bus" {
     name = "${var.stack_name}-address-bus" 
 }
 
-# ADD PERMISSION TO INVOKE ANY  INDICATED LAMBDA FUNCTIONS - WE NEED THREE SEPARATE INVOKES, DOESN WORK WITH LIST OF FUNCTION NAMES 
+# ADD PERMISSIONS TO INVOKE ANY  INDICATED LAMBDA FUNCTIONS - WE NEED THREE SEPARATE INVOKES, DOESN WORK WITH LIST OF FUNCTION NAMES 
 
 resource "aws_lambda_permission" "allow_invoke_add_address_lambda" {
   statement_id  = "AllowExecutionFromEventBridge"
