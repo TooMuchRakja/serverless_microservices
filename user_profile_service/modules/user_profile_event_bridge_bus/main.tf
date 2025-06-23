@@ -60,7 +60,7 @@ resource "aws_cloudwatch_event_target" "invoke_edited_address_lambda" {
   rule           = aws_cloudwatch_event_rule.bus_address_edited.name
   event_bus_name = aws_cloudwatch_event_bus.address_bus.name
   arn            = var.edit_address_function_arn # tu ma byc arn funkcji 
-  target_id      = "AddAddressHandler" # unique name, doesnt corealte with lambda handler
+  target_id      = "EditAddressHandler" # unique name, doesnt corealte with lambda handler
 }
 
 # ZDEFINIOWAĆ RULE, TARGET ORAZ INWOKACJE DLA DELETE 
@@ -77,5 +77,5 @@ resource "aws_cloudwatch_event_target" "invoke_delete_address_lambda" {
   rule           = aws_cloudwatch_event_rule.bus_address_deleted.name
   event_bus_name = aws_cloudwatch_event_bus.address_bus.name
   arn            = var.delete_address_function_arn # tu ma byc arn funkcji
-  target_id      = "AddAddressHandler" # unique name, doesnt corealte with lambda handler
+  target_id      = "DeleteAddressHandler" # unique name, doesnt corealte with lambda handler
 }
