@@ -15,7 +15,7 @@ variable "global_api_logging_role_arn" {
 }
 
 variable "aws_api_gateway_account_settings" {
-    type = string
+    type = any
 }
 
 variable "address_api_access_logs_arn" {
