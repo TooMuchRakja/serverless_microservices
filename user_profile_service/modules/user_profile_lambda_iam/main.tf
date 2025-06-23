@@ -196,7 +196,7 @@ EOF
 }
 resource "aws_iam_policy_attachment" "delete_address_function_attach" {
   name       = "${var.delete_address_function_name}-lambda_attachment"
-  roles      = [aws_iam_role.delete_address_function_name.name]
+  roles      = [aws_iam_role.delete_address_function_role.name]
   policy_arn = aws_iam_policy.delete_address_function_policy.arn
 }
 

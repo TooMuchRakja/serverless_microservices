@@ -13,8 +13,8 @@ resource "aws_lambda_function" "add_address_function" {
   role          = var.add_address_role_arn # do zmiany rola - podać arn kiedy już zdefinuiję poprawną rolę i uprawnienia
   handler       = "lambda_function.lambda_handler"
   runtime       = var.lambda_runtime
-  memory_size   = var.memory_size
-  timeout       = var.timeout
+  memory_size   = var.lambda_memory
+  timeout       = var.lambda_timeout
   layers        = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:12"]
 
   s3_bucket = local.lambda_code_bucket
@@ -35,8 +35,8 @@ resource "aws_lambda_function" "edit_address_function" {
   role          = var.edit_address_role_arn # do zmiany rola - podać arn kiedy już zdefinuiję poprawną rolę i uprawnienia
   handler       = "lambda_function.lambda_handler"
   runtime       = var.lambda_runtime
-  memory_size   = var.memory_size
-  timeout       = var.timeout
+  memory_size   = var.lambda_memory
+  timeout       = var.lambda_timeout
   layers        = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:12"]
 
   s3_bucket = local.lambda_code_bucket
@@ -57,8 +57,8 @@ resource "aws_lambda_function" "delete_address_function" {
   role          =  var.delete_address_role_arn # do zmiany rola - podać arn kiedy już zdefinuiję poprawną rolę i uprawnienia
   handler       = "lambda_function.lambda_handler"
   runtime       = var.lambda_runtime
-  memory_size   = var.memory_size
-  timeout       = var.timeout
+  memory_size   = var.lambda_memory
+  timeout       = var.lambda_timeout
   layers        = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:12"]
 
   s3_bucket = local.lambda_code_bucket
@@ -79,8 +79,8 @@ resource "aws_lambda_function" "list_address_function" {
   role          =  var.list_address_role_arn
   handler       = "lambda_function.lambda_handler"
   runtime       = var.lambda_runtime
-  memory_size   = var.memory_size
-  timeout       = var.timeout
+  memory_size   = var.lambda_memory
+  timeout       = var.lambda_timeout
   layers        = ["arn:aws:lambda:${var.region}:017000801446:layer:AWSLambdaPowertoolsPythonV3-${var.python_version}-x86_64:12"]
 
   s3_bucket = local.lambda_code_bucket
