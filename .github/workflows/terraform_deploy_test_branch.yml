@@ -191,9 +191,9 @@ jobs:
         run: terraform validate
         working-directory: .
 
-    #  - name: Terraform Plan
-    #    run: terraform plan -out=tfplan
-    #    working-directory: .
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+        working-directory: .
 
   # Odkomentuj gdy będziesz gotowy do faktycznego deployu
     #  - name: Terraform Apply
