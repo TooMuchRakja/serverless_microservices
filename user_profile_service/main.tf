@@ -12,31 +12,34 @@ module "user_profile_event_bridge_bus" {
   edit_address_function_arn  = module.user_profile_lambdas.edit_address_function_arn
   delete_address_function_arn =  module.user_profile_lambdas.delete_address_function_arn
   list_address_function_arn = module.user_profile_lambdas.list_address_function_arn
-  add_address_function_name = module.user_profile_lambdas.add_address_function_name
-  edit_address_function_name = module.user_profile_lambdas.edit_address_function_name
-  delete_address_function_name = module.user_profile_lambdas.delete_address_function_name
-  list_address_function_name = module.user_profile_lambdas.list_address_function_name
+  add_address_function_name = var.add_address_function_name
+  edit_address_function_name = var.edit_address_function_name
+  delete_address_function_name = var.delete_address_function_name
+  list_address_function_name = var.list_address_function_name
 }
 
 
 module "user_profile_lambdas" {
   source = "./modules/user_profile_lambdas"
   region = var.region
-  stack_name = var.stack_name
   address_table_name = module.user_profile_dynamodb.address_table_name
   add_address_role_arn = module.user_profile_lambda_iam.add_address_role_arn
   edit_address_role_arn = module.user_profile_lambda_iam.edit_address_role_arn
   delete_address_role_arn = module.user_profile_lambda_iam.delete_address_role_arn
   list_address_role_arn = module.user_profile_lambda_iam.list_address_role_arn
+  add_address_function_name = var.add_address_function_name
+  edit_address_function_name = var.edit_address_function_name
+  delete_address_function_name = var.delete_address_function_name
+  list_address_function_name = var.list_address_function_name
 }
 
 module "user_profile_lambda_iam" {
   source = "./modules/user_profile_lambda_iam"
   region = var.region
-  add_address_function_name = module.user_profile_lambdas.add_address_function_name
-  edit_address_function_name = module.user_profile_lambdas.edit_address_function_name
-  delete_address_function_name = module.user_profile_lambdas.delete_address_function_name
-  list_address_function_name = module.user_profile_lambdas.list_address_function_name
+  add_address_function_name = var.add_address_function_name
+  edit_address_function_name = var.edit_address_function_name
+  delete_address_function_name = var.delete_address_function_name
+  list_address_function_name = var.list_address_function_name
   address_table_name = module.user_profile_dynamodb.address_table_name
   address_api_source_arn = module.user_profile_api.address_api_source_arn
 }

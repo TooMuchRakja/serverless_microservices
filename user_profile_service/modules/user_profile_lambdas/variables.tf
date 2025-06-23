@@ -1,6 +1,3 @@
-variable "stack_name" {
-  type = string
-}
 
 variable "lambda_runtime" {
   type    = string
@@ -44,4 +41,20 @@ variable "delete_address_role_arn" {
 
 variable "list_address_role_arn" {
   type = string
+}
+
+variable "add_address_function_name" {
+    type = string
+}
+
+variable "edit_address_function_name" {
+    type = string
+}
+
+variable "delete_address_function_name" {
+    type = string
+}
+
+variable "list_address_function_name" {
+    type = string
 }

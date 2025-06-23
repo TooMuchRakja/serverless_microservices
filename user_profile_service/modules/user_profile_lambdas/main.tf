@@ -8,9 +8,9 @@ locals {
 
 resource "aws_lambda_function" "add_address_function" {
     
-  function_name = "${var.stack_name}_add_address_function"
+  function_name = "${var.add_address_function_name}"
   description   = "Lambda function to add address to DynamoDB table"
-  role          = var.add_address_role_arn# do zmiany rola - podać arn kiedy już zdefinuiję poprawną rolę i uprawnienia
+  role          = var.add_address_role_arn # do zmiany rola - podać arn kiedy już zdefinuiję poprawną rolę i uprawnienia
   handler       = "lambda_function.lambda_handler"
   runtime       = var.lambda_runtime
   memory_size   = var.memory_size
@@ -30,7 +30,7 @@ resource "aws_lambda_function" "add_address_function" {
 
 resource "aws_lambda_function" "edit_address_function" {
     
-  function_name = "${var.stack_name}_edit_address_function"
+  function_name = "${var.edit_address_function_name}"
   description   = "Lambda function to edit address to DynamoDB table"
   role          = var.edit_address_role_arn # do zmiany rola - podać arn kiedy już zdefinuiję poprawną rolę i uprawnienia
   handler       = "lambda_function.lambda_handler"
@@ -52,7 +52,7 @@ resource "aws_lambda_function" "edit_address_function" {
 
 resource "aws_lambda_function" "delete_address_function" {
     
-  function_name = "${var.stack_name}_add_address_function"
+  function_name = "${var.delete_address_function_name}"
   description   = "Lambda function to add address to DynamoDB table"
   role          =  var.delete_address_role_arn # do zmiany rola - podać arn kiedy już zdefinuiję poprawną rolę i uprawnienia
   handler       = "lambda_function.lambda_handler"
@@ -74,7 +74,7 @@ resource "aws_lambda_function" "delete_address_function" {
 
 resource "aws_lambda_function" "list_address_function" {
     
-  function_name = "${var.stack_name}_list_address_function"
+  function_name = "${var.list_address_function_name}"
   description   = "Lambda function which returns addresses from dynamodb address table"
   role          =  var.list_address_role_arn
   handler       = "lambda_function.lambda_handler"
