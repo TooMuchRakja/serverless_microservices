@@ -3,6 +3,7 @@ import logging
 import os
 import pytest
 import json
+import subprocess
 
 globalConfig = {}
 LOGGER = logging.getLogger(__name__)
