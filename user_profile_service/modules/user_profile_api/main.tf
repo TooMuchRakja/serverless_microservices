@@ -57,7 +57,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
                 {
                   "Entries":[
                     {
-                      "Detail": "$util.escapeJavaScript($input.json("\$"))",
+                      "Detail": "$util.escapeJavaScript($input.json("$.detail"))",
                       "DetailType":"address.added",
                       "EventBusName":"${var.address_bus_name}",
                       "Source":"customer-profile"
