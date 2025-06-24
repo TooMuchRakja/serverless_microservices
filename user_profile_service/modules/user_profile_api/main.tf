@@ -19,10 +19,10 @@ resource "aws_api_gateway_rest_api" "address_api" {
         get = {
           security = [{ CognitoAuthorizer = [] }]
           x-amazon-apigateway-integration = {
-            type                 = "aws_proxy"
-            httpMethod           = "POST"
-            uri                  = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.list_address_function_arn}/invocations"
-            passthroughBehavior  = "when_no_match"
+            type                  = "aws_proxy"
+            httpMethod            = "POST"
+            uri                   = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.list_address_function_arn}/invocations"
+            passthroughBehavior   = "when_no_match"
             integrationHttpMethod = "POST"
           }
           responses = {
@@ -48,7 +48,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
             type                = "aws"
             httpMethod          = "POST"
             uri                 = "arn:aws:apigateway:${var.region}:events:action/PutEvents"
-            credentials         = aws_iam_role.address_api_role.arn  # this is one role for whole api which allows api to add to event bridge 
+            credentials         = aws_iam_role.address_api_role.arn # this is one role for whole api which allows api to add to event bridge
             passthroughBehavior = "when_no_templates"
             requestTemplates = {
               "application/json" = <<-EOF
@@ -56,12 +56,17 @@ resource "aws_api_gateway_rest_api" "address_api" {
                 #set($context.requestOverride.header.Content-Type = "application/x-amz-json-1.1")
                 #set($inputRoot = $input.path("$"))
                 {
-                  "Entries":[
+                  "Entries": [
                     {
-                      "Detail": "{#foreach($paramName in $inputRoot.keySet())\"$paramName\" : \"$util.escapeJavaScript($inputRoot.get($paramName))\" #if($foreach.hasNext),#end #end,\"userId\": \"$context.authorizer.claims.sub\"}",
-                      "DetailType":"address.added",
-                      "EventBusName":"${var.address_bus_name}",
-                      "Source":"customer-profile"
+                      "Detail": {
+                        #foreach($paramName in $inputRoot.keySet())
+                          "$paramName": "$util.escapeJavaScript($inputRoot.get($paramName))"#if($foreach.hasNext),#end
+                        #end,
+                        "userId": "$context.authorizer.claims.sub"
+                      },
+                      "DetailType": "address.added",
+                      "EventBusName": "${var.address_bus_name}",
+                      "Source": "customer-profile"
                     }
                   ]
                 }
@@ -108,7 +113,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
             type                = "aws"
             httpMethod          = "POST"
             uri                 = "arn:aws:apigateway:${var.region}:events:action/PutEvents"
-            credentials         = aws_iam_role.address_api_role.arn 
+            credentials         = aws_iam_role.address_api_role.arn
             passthroughBehavior = "when_no_templates"
             requestTemplates = {
               "application/json" = <<-EOF
@@ -161,7 +166,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
             type                = "aws"
             httpMethod          = "POST"
             uri                 = "arn:aws:apigateway:${var.region}:events:action/PutEvents"
-            credentials         = aws_iam_role.address_api_role.arn 
+            credentials         = aws_iam_role.address_api_role.arn
             passthroughBehavior = "when_no_templates"
             requestTemplates = {
               "application/json" = <<-EOF
@@ -248,7 +253,6 @@ resource "aws_api_gateway_rest_api" "address_api" {
   })
 }
 
-
 resource "aws_api_gateway_deployment" "address_api_deploy" {
   rest_api_id = aws_api_gateway_rest_api.address_api.id
 
@@ -262,7 +266,7 @@ resource "aws_api_gateway_deployment" "address_api_deploy" {
 }
 
 resource "aws_api_gateway_stage" "address_stage" {
-  stage_name    =  "prod"
+  stage_name    = "prod"
   depends_on    = [var.aws_api_gateway_account_settings]
   rest_api_id   = aws_api_gateway_rest_api.address_api.id
   deployment_id = aws_api_gateway_deployment.address_api_deploy.id
@@ -300,24 +304,18 @@ resource "aws_iam_role" "address_api_role" {
   })
 }
 
-resource "aws_iam_policy" "address_api_role_policy" {
-  name = "address_api_role_policy"
+resource "aws_iam_role_policy" "address_api_policy" {
+  name = "address_api_policy"
+  role = aws_iam_role.address_api_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action = [
-          "events:PutEvents"
-        ]
+        Action = "events:PutEvents"
         Effect = "Allow"
-        Resource = "arn:aws:events:${var.region}:${data.aws_caller_identity.current.account_id}:event-bus/${var.address_bus_name}"
+        Resource = "*"
       }
     ]
   })
-}
-
-resource "aws_iam_role_policy_attachment" "address_api_attachment" {
-  role       = aws_iam_role.address_api_role.name
-  policy_arn = aws_iam_policy.address_api_role_policy.arn
 }
