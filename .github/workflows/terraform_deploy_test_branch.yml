@@ -254,7 +254,7 @@ jobs:
         shell: bash
 
 
-# Rollback procedure in case of failure 
+# Rollback procedure in case of failure #
   rollback:
     runs-on: ubuntu-latest
     needs: deploy_and_test
