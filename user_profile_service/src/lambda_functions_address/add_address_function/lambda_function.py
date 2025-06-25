@@ -4,7 +4,7 @@ import boto3
 import uuid
 from aws_lambda_powertools import Logger, Tracer
 
-# Globals
+# Globals comment
 logger = Logger()
 tracer = Tracer(service="APP")
 address_table = os.getenv('ADDRESS_TABLE_NAME')
