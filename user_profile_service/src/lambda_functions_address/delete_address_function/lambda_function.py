@@ -2,7 +2,7 @@ import os
 import boto3
 from aws_lambda_powertools import Logger, Tracer
 
-# Globals
+# Globals #
 logger = Logger()
 tracer = Tracer(service="APP")
 address_table = os.getenv('ADDRESS_TABLE_NAME')
