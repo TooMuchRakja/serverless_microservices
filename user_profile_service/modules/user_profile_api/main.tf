@@ -114,10 +114,11 @@ resource "aws_api_gateway_rest_api" "address_api" {
               "application/json" = <<-EOF
                 #set($context.requestOverride.header.X-Amz-Target = "AWSEvents.PutEvents")
                 #set($context.requestOverride.header.Content-Type = "application/x-amz-json-1.1")
+                #set($inputRoot = $input.path("$"))
                 {
                   "Entries":[
                     {
-                      "Detail": "{\"userId\":\"$context.authorizer.claims.sub\",\"addressId\":\"$input.params('addressId')\",\"data\":$util.escapeJavaScript($input.json("\$"))}",
+                      "Detail": "{#foreach($paramName in $inputRoot.keySet())\"$paramName\" : \"$util.escapeJavaScript($inputRoot.get($paramName))\" #if($foreach.hasNext),#end #end,\"userId\": \"$context.authorizer.claims.sub\",\"addressId\": \"$input.params().get('path').get('addressId')\"}",
                       "DetailType":"address.updated",
                       "EventBusName":"${var.address_bus_name}",
                       "Source":"customer-profile"
@@ -170,7 +171,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
                 {
                   "Entries":[
                     {
-                      "Detail": "{\"userId\":\"$context.authorizer.claims.sub\",\"addressId\":\"$input.params('addressId')\"}",
+                      "Detail": "{\"userId\": \"$context.authorizer.claims.sub\",\"addressId\": \"$input.params().get('path').get('addressId')\"}",
                       "DetailType":"address.deleted",
                       "EventBusName":"${var.address_bus_name}",
                       "Source":"customer-profile"
