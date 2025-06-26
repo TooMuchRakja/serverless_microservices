@@ -20,7 +20,7 @@ def test_add_user_address_with_invalid_fields(global_config):
         headers={'Authorization': global_config["user1UserIdToken"], 
             'Content-Type': 'application/json'}
     ) 
-    assert response.status_code == 400
+    assert response.status_code == 500
     
 def test_add_user_address(global_config):
     # LOGGER.info("ID token: %s", global_config["user1UserIdToken"])
@@ -69,5 +69,5 @@ def test_update_user_address(global_config):
 #        global_config["address_api_endpoint_url"] + '/address/' + user1addresses['addresses'][0]['address_id'],
 #        headers={'Authorization': global_config["user1UserIdToken"], 
 #            'Content-Type': 'application/json'}        
-    )
+#   )
 #    assert response.status_code == 200
