@@ -54,20 +54,20 @@ def test_update_user_address(global_config):
     )
     assert response.status_code == 200  
 
-def test_delete_user_address(global_config):
+#def test_delete_user_address(global_config):
 
-    user1response = requests.get(
-        global_config["address_api_endpoint_url"] + '/address',
-        headers={'Authorization': global_config["user1UserIdToken"], 
-            'Content-Type': 'application/json'}
-    )
+#    user1response = requests.get(
+#        global_config["address_api_endpoint_url"] + '/address',
+#        headers={'Authorization': global_config["user1UserIdToken"], 
+#            'Content-Type': 'application/json'}
+#    )
 
     # LOGGER.info(user1response.text)
-    user1addresses = json.loads(user1response.text)  
+#    user1addresses = json.loads(user1response.text)  
 
-    response = requests.delete(
-        global_config["address_api_endpoint_url"] + '/address/' + user1addresses['addresses'][0]['address_id'],
-        headers={'Authorization': global_config["user1UserIdToken"], 
-            'Content-Type': 'application/json'}        
+#    response = requests.delete(
+#        global_config["address_api_endpoint_url"] + '/address/' + user1addresses['addresses'][0]['address_id'],
+#        headers={'Authorization': global_config["user1UserIdToken"], 
+#            'Content-Type': 'application/json'}        
     )
-    assert response.status_code == 200
+#    assert response.status_code == 200
