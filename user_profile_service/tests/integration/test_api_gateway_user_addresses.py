@@ -11,7 +11,7 @@ user1_new_address = {"line1": "4566 Main", "line2": "Suite 200", "city": "Seattl
 user2_new_address = {"line1": "7505 Beverly Blvd", "line2": "Apt 7", "city": "Los Angeles", "stateProvince": "CA", "postal": "90036"}
 
 def test_add_user_address_with_invalid_fields(global_config):
-    # LOGGER.info("ID token: %s", global_config["user1UserIdToken"])
+    # LOGGER.info("ID token: %s", global_config["user1UserIdToken"]) ##
     # LOGGER.info("Endpoint: %s", global_config["address_api_endpoint_url"])
     invalid_address = {"city": "Seattle", "stateProvince": "WA", "postal": "12345"}
     response = requests.post(
