@@ -80,6 +80,7 @@ module "favourites_dynamodb" {
 module "favourites_lambdas" {
   source = "./modules/favourites_lambdas"
   region = var.region
+  stack_name = var.stack_name
   environment = var.environment
   favourites_dynamodb_table_name = module.favourites_dynamodb.favourites_dynamodb_table_name
   add_favourites_function_name = var.add_favourites_function_name
