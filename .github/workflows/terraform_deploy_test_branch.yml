@@ -92,6 +92,15 @@ jobs:
             type: simple
             entry: lambda_function.py
 
+          - name: list_favourites_function
+            path: ./user_profile_service/src/lambda_functions_favourites/list_favourites_function
+            type: simple
+            entry: lambda_function.py
+          - name: add_favourites_function
+            path: ./user_profile_service/src/lambda_functions_favourites/add_favourites_function
+            type: simple
+            entry: lambda_function.py
+
 
     steps:
       - name: Checkout repo
@@ -191,20 +200,20 @@ jobs:
         run: terraform validate
         working-directory: .
 
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
-        working-directory: .
+    #  - name: Terraform Plan
+    #    run: terraform plan -out=tfplan
+    #    working-directory: .
 
   # Odkomentuj gdy będziesz gotowy do faktycznego deployu
-      - name: Terraform Apply
-        id: apply
-        run: terraform apply -auto-approve tfplan
-        working-directory: .
+    #  - name: Terraform Apply
+    #    id: apply
+    #    run: terraform apply -auto-approve tfplan
+    #    working-directory: .
 
 
 
-      - name: Wait for resources to establish connections
-        run: sleep 10
+    #  - name: Wait for resources to establish connections
+    #    run: sleep 10
 
       # ---- Testy modułu użytkowników ----
     #  - name: Set up test environment for users module
@@ -240,18 +249,18 @@ jobs:
     #    shell: bash
 
 
-      - name: Set up test environment for user profile address module
-        run: |
-          python -m venv test_address
-          source test_address/bin/activate
-          pip install -r user_profile_service/tests/requirements.txt
-        shell: bash
+    # - name: Set up test environment for user profile address module
+    #    run: |
+    #      python -m venv test_address
+    #      source test_address/bin/activate
+    #      pip install -r user_profile_service/tests/requirements.txt
+    #    shell: bash
 
-      - name: Run Integration Tests  user profile address module
-        run: |
-          source test_address/bin/activate
-          PYTHONPATH=user_profile_service/src python3 -m pytest user_profile_service/tests/integration -v
-        shell: bash
+    #  - name: Run Integration Tests  user profile address module
+    #    run: |
+    #      source test_address/bin/activate
+    #      PYTHONPATH=user_profile_service/src python3 -m pytest user_profile_service/tests/integration -v
+    #    shell: bash
 
 
 # Rollback procedure in case of failure #

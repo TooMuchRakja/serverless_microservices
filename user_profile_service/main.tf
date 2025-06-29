@@ -2,6 +2,8 @@
 
 module "user_profile_dynamodb" {
   source = "./modules/user_profile_dynamodb"
+  environment = var.environment
+  stack_name = var.stack_name
 }
 
 module "user_profile_event_bridge_bus" {
@@ -22,6 +24,7 @@ module "user_profile_event_bridge_bus" {
 module "user_profile_lambdas" {
   source = "./modules/user_profile_lambdas"
   region = var.region
+  stack_name = var.stack_name
   address_table_name = module.user_profile_dynamodb.address_table_name
   add_address_role_arn = module.user_profile_lambda_iam.add_address_role_arn
   edit_address_role_arn = module.user_profile_lambda_iam.edit_address_role_arn
@@ -42,6 +45,9 @@ module "user_profile_lambda_iam" {
   list_address_function_name = var.list_address_function_name
   address_table_name = module.user_profile_dynamodb.address_table_name
   address_api_source_arn = module.user_profile_api.address_api_source_arn
+  favourites_dynamodb_table_name = module.favourites_dynamodb.favourites_dynamodb_table_name
+  add_favourites_function_name = var.add_favourites_function_name
+  list_favourites_function_name = var.list_favourites_function_name
 }
 
 module "user_profile_api"  {
@@ -55,5 +61,37 @@ module "user_profile_api"  {
   list_address_function_arn = module.user_profile_lambdas.list_address_function_arn
   aws_api_gateway_account_settings = var.aws_api_gateway_account_settings
   address_bus_name = module.user_profile_event_bridge_bus.address_bus_name
+  add_favourites_function_name = var.add_favourites_function_name
+  list_favourites_function_name = var.list_favourites_function_name
+  add_favourites_role_arn = module.user_profile_lambda_iam.add_favourites_role_arn
+  list_favourites_role_arn = module.user_profile_lambda_iam.list_favourites_role_arn
+  favourites_sqs_queue_arn = module.favourites_sqs.favourites_sqs_queue_arn
+  favourites_sqs_queue_name = module.favourites_sqs.favourites_sqs_queue_name
+  list_favourites_function_arn = module.favourites_lambdas.list_favourites_function_arn
 }
+
+module "favourites_dynamodb" {
+  source = "./modules/favourites_dynamodb"
+  environment = var.environment
+  stack_name = var.stack_name
+}
+
+module "favourites_lambdas" {
+  source = "./modules/favourites_lambdas"
+  region = var.region
+  environment = var.environment
+  favourites_dynamodb_table_name = module.favourites_dynamodb.favourites_dynamodb_table_name
+  add_favourites_function_name = var.add_favourites_function_name
+  list_favourites_function_name = var.list_favourites_function_name
+  add_favourites_role_arn = module.user_profile_lambda_iam.add_favourites_role_arn
+  list_favourites_role_arn = module.user_profile_lambda_iam.list_favourites_role_arn
+}
+
+
+module "favourites_sqs" { 
+  source = "./modules/favourites_sqs"
+  stack_name = var.stack_name
+  environment = var.environment
+}
+
 

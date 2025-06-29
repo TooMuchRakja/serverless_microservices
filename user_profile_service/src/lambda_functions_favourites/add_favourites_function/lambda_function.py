@@ -6,7 +6,7 @@ from aws_lambda_powertools.utilities.data_classes import event_source, SQSEvent
 # Globals
 logger = Logger()
 tracer = Tracer(service="APP")
-favorites_table = os.getenv('TABLE_NAME')
+favorites_table = os.getenv('FAVOURITES_TABLE_NAME')
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(favorites_table)
 

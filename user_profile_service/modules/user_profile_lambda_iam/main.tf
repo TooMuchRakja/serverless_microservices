@@ -273,3 +273,135 @@ resource "aws_lambda_permission" "list_address_permission" {
   source_arn    = "${var.address_api_source_arn}/prod/GET/address"
 }
 
+
+# ADD FAVOURITES RESTAURANTS TO FAVOURITES TABLE - FUNCTION ROLE 
+resource "aws_iam_role" "add_favourites_function_role" {
+  name = "${var.add_favourites_function_name}-role" 
+  description = "Add favourite restautrant Lambda function IAM role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+resource "aws_iam_policy" "add_favourites_function_policy" {
+  name        = "${var.add_favourites_function_name}-policy" 
+  description = "Add favourite restautrant Lambda function policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:ConditionCheckItem"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.favourites_dynamodb_table_name}"
+    },
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+
+
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+resource "aws_iam_policy_attachment" "add_favourites_function_attach" {
+  name       = "${var.add_favourites_function_name}-lambda_attachment"
+  roles      = [aws_iam_role.add_favourites_function_role.name] 
+  policy_arn = aws_iam_policy.add_favourites_function_policy.arn
+}
+
+# LIST FAVOURITE RESTAURANTS TO FAVOURITES TABLE - FUNCTION ROLE 
+resource "aws_iam_role" "list_favourites_function_role" {
+  name = "${var.list_favourites_function_name}-role"
+  description = "Lambda function role which allows to list favourite restaurants from Favourites DynamoDB Table"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "list_favourites_function_policy" {
+  name        = "${var.list_favourites_function_name}-policy"
+  description = "List favourites lambda policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "dynamodb:Scan",
+        "dynamodb:Query",
+        "dynamodb:DescribeTable"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:*:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.favourites_dynamodb_table_name}"
+    },
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "xray:PutTelemetryRecords",
+        "xray:PutTraceSegments"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+resource "aws_iam_policy_attachment" "list_favourites_function_attach" {
+  name       = "${var.list_favourites_function_name}-lambda_attachment"
+  roles      = [aws_iam_role.list_favourites_function_role.name]
+  policy_arn = aws_iam_policy.list_favourites_function_policy.arn
+}
+
+

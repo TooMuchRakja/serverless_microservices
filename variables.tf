@@ -9,3 +9,8 @@ variable "stack_name" {
 variable "sns_email" {
   default = "szymekp1994@gmail.com"
 }
+
+variable "environment" {
+  type = string
+  default = "test"
+}

@@ -26,3 +26,15 @@ variable "address_api_source_arn" {
     type = string
 }
 
+variable "favourites_dynamodb_table_name" {
+  type = string
+}
+
+variable "add_favourites_function_name" {
+  type = string
+}
+
+variable "list_favourites_function_name" {
+  type = string
+}
+

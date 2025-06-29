@@ -11,4 +11,9 @@ resource "aws_dynamodb_table" "user_profile_address_table" {
         name = "address_id"
         type = "S"
     }
-}  
+  tags = {
+    stack_name  = "${var.stack_name}"
+    Environment = "${var.environment}"
+    Service     = "User_Profile_Address_Table"
+  }
+} 

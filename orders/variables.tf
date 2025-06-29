@@ -50,3 +50,7 @@ variable "orders_api_access_logs" {
 variable "aws_api_gateway_account_settings" {
   type = any
 }
+
+variable "environment" {
+  type = string
+}

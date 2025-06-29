@@ -58,3 +58,11 @@ variable "delete_address_function_name" {
 variable "list_address_function_name" {
     type = string
 }
+
+variable "environment" {
+  type = string
+}
+
+variable "stack_name" {
+    type = string
+}

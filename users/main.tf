@@ -62,7 +62,9 @@ module  "api-gateway"  {
 
 module "dynamodb" {
     source = "./modules/dynamodb"
-    table_name = "${var.stack_name}-dynbamodb" # tutaj nadaje nazwe zmiennej z modulu - tam jest table_name
+    table_name = "${var.stack_name}-dynbamodb"
+    environment = var.environment
+    stack_name = var.stack_name # tutaj nadaje nazwe zmiennej z modulu - tam jest table_name
 }
 
 module "lambda" {

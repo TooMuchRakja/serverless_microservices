@@ -42,3 +42,16 @@ variable "list_address_function_name" {
     default = "serverless_ws_list_address_function"
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "add_favourites_function_name" {
+    type = string
+    default = "serverless_ws_add_favourites_function"
+}
+
+variable "list_favourites_function_name" {
+    type = string
+    default = "serverless_ws_list_favourites_function"
+}

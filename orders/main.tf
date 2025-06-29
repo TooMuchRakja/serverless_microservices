@@ -16,6 +16,7 @@ module "orders_apigateway" {
 module "orders_dynamodb" {
   source     = "./modules/orders_dynamodb"
   stack_name = var.stack_name
+  environemnt = var.environment
 }
 
 module "orders_lambda" {

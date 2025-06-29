@@ -34,4 +34,35 @@ variable "address_bus_name" {
   type = string
 }
 
+variable "add_favourites_function_name" {
+  type = string
+}
+
+variable "list_favourites_function_name" {
+  type = string
+}
+
+variable "add_favourites_role_arn" {
+  type = string
+}
+
+variable "list_favourites_role_arn" {
+  type = string
+}
+
+variable "favourites_sqs_queue_arn" {
+  type = string
+}
+
+variable "favourites_sqs_queue_name" {
+  type = string
+}
+
+variable "list_favourites_function_arn" {
+  type = string
+}
+
+
+
+
 

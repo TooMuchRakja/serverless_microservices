@@ -26,6 +26,10 @@ resource "aws_lambda_function" "add_address_function" {
     }
   }
 
+  tags = {
+    stack_name  = "${var.stack_name}"
+    Environment = "${var.environment}"
+  }
 }
 
 resource "aws_lambda_function" "edit_address_function" {
@@ -48,6 +52,10 @@ resource "aws_lambda_function" "edit_address_function" {
     }
   }
 
+  tags = {
+    stack_name  = "${var.stack_name}"
+    Environment = "${var.environment}"
+  }
 }
 
 resource "aws_lambda_function" "delete_address_function" {
@@ -70,6 +78,10 @@ resource "aws_lambda_function" "delete_address_function" {
     }
   }
 
+  tags = {
+    stack_name  = "${var.stack_name}"
+    Environment = "${var.environment}"
+  }
 }
 
 resource "aws_lambda_function" "list_address_function" {
@@ -92,4 +104,8 @@ resource "aws_lambda_function" "list_address_function" {
     }
   }
 
+  tags = {
+    stack_name  = "${var.stack_name}"
+    Environment = "${var.environment}"
+  }
 }

@@ -10,4 +10,9 @@ module "dynamodb_table" {
       type   = "S"
     }
   ]
+  tags = {
+    stack_name  = "${var.stack_name}"
+    Environment = "${var.environment}"
+    Service     = "Users_Table"
+  }
 }

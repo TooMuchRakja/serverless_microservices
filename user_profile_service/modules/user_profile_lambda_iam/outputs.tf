@@ -13,3 +13,11 @@ output "delete_address_role_arn" {
 output "list_address_role_arn" {
     value = aws_iam_role.list_address_function_role.arn
 }
+
+output "add_favourites_role_arn" {
+    value = aws_iam_role.add_favourites_function_role.arn
+}
+
+output "list_favourites_role_arn" {
+    value = aws_iam_role.list_favourites_function_role.arn
+}

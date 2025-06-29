@@ -19,8 +19,8 @@ resource "aws_dynamodb_table" "orders_table" {
 
   tags = {
     stack_name  = "${var.stack_name}"
-    Environment = "Prod"
-    Service     = "Orders"
+    Environment = "${var.environment}"
+    Service     = "Orders_Table"
   }
 }
 
@@ -46,7 +46,7 @@ resource "aws_dynamodb_table" "idempotence_table" {
 
   tags = {
     stack_name  = "${var.stack_name}"
-    Environment = "Prod"
-    Service     = "Idempotence"
+    Environment = "${var.environment}"
+    Service     = "Idempotence_Table"
   }
 }
