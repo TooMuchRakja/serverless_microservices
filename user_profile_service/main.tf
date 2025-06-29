@@ -23,6 +23,7 @@ module "user_profile_event_bridge_bus" {
 
 module "user_profile_lambdas" {
   source = "./modules/user_profile_lambdas"
+  environment = var.environment
   region = var.region
   stack_name = var.stack_name
   address_table_name = module.user_profile_dynamodb.address_table_name
