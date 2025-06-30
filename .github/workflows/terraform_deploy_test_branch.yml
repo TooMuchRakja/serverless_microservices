@@ -31,7 +31,7 @@ jobs:
           aws-region: ${{ env.TF_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-# package lambda poprawne i sprawdzone 
+# package lambda poprawne i sprawdzone ##
   package_lambda:
     runs-on: ubuntu-latest
     needs: initialize_env
@@ -205,17 +205,17 @@ jobs:
         working-directory: .
 
   # Odkomentuj gdy będziesz gotowy do faktycznego deployu
-    #  - name: Terraform Apply
-    #    id: apply
-    #    run: terraform apply -auto-approve tfplan
-    #    working-directory: .
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve tfplan
+        working-directory: .
 
 
 
-    #  - name: Wait for resources to establish connections
-    #    run: sleep 10
+      - name: Wait for resources to establish connections
+        run: sleep 10
 
-      # ---- Testy modułu użytkowników ----
+    # ---- Testy modułu użytkowników ----
     #  - name: Set up test environment for users module
     #    run: |
     #      python -m venv test
@@ -259,45 +259,58 @@ jobs:
     #  - name: Run Integration Tests  user profile address module
     #    run: |
     #      source test_address/bin/activate
-    #      PYTHONPATH=user_profile_service/src python3 -m pytest user_profile_service/tests/integration -v
+    #      PYTHONPATH=user_profile_service/src/lambda_functions_address python3 -m pytest user_profile_service/tests/integration/addresses -v
     #    shell: bash
+
+      - name: Set up test environment for favourites 
+        run: |
+          python -m venv test_address
+          source test_address/bin/activate
+          pip install -r user_profile_service/tests/requirements.txt
+        shell: bash
+
+      - name: Run Integration Tests for favourites
+        run: |
+          source test_address/bin/activate
+          PYTHONPATH=user_profile_service/src/lambda_functions_favourites python3 -m pytest user_profile_service/tests/integration/favourites -v
+        shell: bash
 
 
 # Rollback procedure in case of failure #
-#  rollback:
-#    runs-on: ubuntu-latest
-#    needs: deploy_and_test
-#    if: ${{ failure() }}
-#    steps:
-#      - name: Checkout repo
-#        uses: actions/checkout@v3
+  rollback:
+    runs-on: ubuntu-latest
+    needs: deploy_and_test
+    if: ${{ failure() }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-#      - name: Set up AWS credentials
-#        uses: aws-actions/configure-aws-credentials@v1
-#        with:
-#          aws-region: ${{ env.TF_REGION }}
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.TF_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-#      - name: Set up Terraform
-#        uses: hashicorp/setup-terraform@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
 
-#      - name: Generate backend config
-#        run: |
-#          cat <<EOF > backend.conf.hcl 
-#          bucket         = "${TF_BUCKET_NAME}"
-#          key            = "${TF_BUCKET_KEY}"
-#          region         = "${TF_REGION}"
-#          dynamodb_table = "${TF_DYNAMO_TABLE}"
-#          encrypt        = true
-#          EOF
+      - name: Generate backend config
+        run: |
+          cat <<EOF > backend.conf.hcl 
+          bucket         = "${TF_BUCKET_NAME}"
+          key            = "${TF_BUCKET_KEY}"
+          region         = "${TF_REGION}"
+          dynamodb_table = "${TF_DYNAMO_TABLE}"
+          encrypt        = true
+          EOF
 
-#      - name: Terraform Init
-#        run: terraform init -backend-config=backend.conf.hcl 
-#        working-directory: .
+      - name: Terraform Init
+        run: terraform init -backend-config=backend.conf.hcl 
+        working-directory: .
 
-#      - name: Rollback - Terraform Destroy
-#        run: terraform destroy -auto-approve
-#        working-directory: .
+      - name: Rollback - Terraform Destroy
+        run: terraform destroy -auto-approve
+        working-directory: .
 
 
