@@ -7,13 +7,49 @@ resource "aws_api_gateway_rest_api" "address_api" {
     types = ["REGIONAL"]
   }
 
-
   body = jsonencode({
     openapi = "3.0.1"
     info = {
       title       = "Address API"
       version     = "1.0.0"
       description = "Address management API, secured with Cognito authorizer"
+    }
+    components = {
+      schemas = {
+        Empty = {
+          title = "Empty Schema"
+          type  = "object"
+        }
+        UserAddressInputModel = {
+          required = ["city", "line1", "line2", "postal", "stateProvince"]
+          type     = "object"
+          properties = {
+            line1         = { type = "string" }
+            line2         = { type = "string" }
+            city          = { type = "string" }
+            stateProvince = { type = "string" }
+            postal        = { type = "string" }
+          }
+        }
+      }
+      securitySchemes = {
+        CognitoAuthorizer = {
+          type                           = "apiKey"
+          name                           = "Authorization"
+          in                             = "header"
+          x-amazon-apigateway-authtype   = "cognito_user_pools"
+          x-amazon-apigateway-authorizer = {
+            type         = "cognito_user_pools"
+            providerARNs = ["arn:aws:cognito-idp:${var.region}:${data.aws_caller_identity.current.account_id}:userpool/${var.user_pool_id}"]
+          }
+        }
+      }
+    }
+    "x-amazon-apigateway-request-validators" = {
+      "Validate body" = {
+        validateRequestParameters = false
+        validateRequestBody       = true
+      }
     }
     paths = {
       "/address" = {
@@ -48,7 +84,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
             type                = "aws"
             httpMethod          = "POST"
             uri                 = "arn:aws:apigateway:${var.region}:events:action/PutEvents"
-            credentials         = aws_iam_role.address_api_role.arn # ROLA KTORA UPRAWNIA API DO DODAWANIA DO EVENTS 
+            credentials         = aws_iam_role.address_api_role.arn
             passthroughBehavior = "when_no_templates"
             requestTemplates = {
               "application/json" = <<-EOF
@@ -69,10 +105,8 @@ resource "aws_api_gateway_rest_api" "address_api" {
             }
             responses = {
               default = {
-                statusCode = "200"
-                responseTemplates = {
-                  "application/json" = "{}"
-                }
+                statusCode        = "200"
+                responseTemplates = { "application/json" = "{}" }
               }
             }
           }
@@ -80,32 +114,21 @@ resource "aws_api_gateway_rest_api" "address_api" {
             required = true
             content = {
               "application/json" = {
-                schema = {
-                  "$ref" = "#/components/schemas/UserAddressInputModel"
-                }
+                schema = { "$ref" = "#/components/schemas/UserAddressInputModel" }
               }
             }
           }
           parameters = [
-            {
-              name   = "Content-Type"
-              in     = "header"
-              schema = { type = "string" }
-            },
-            {
-              name   = "X-Amz-Target"
-              in     = "header"
-              schema = { type = "string" }
-            }
+            { name = "Content-Type", in = "header", schema = { type = "string" } },
+            { name = "X-Amz-Target", in = "header", schema = { type = "string" } }
           ]
         }
       }
-
       "/address/{addressId}" = {
         put = {
           security = [{ CognitoAuthorizer = [] }]
           "x-amazon-apigateway-integration" = {
-            type                = "aws" # TYPE AWS OZNACZA NON PROXY INTEGRATION, UZYWANE DLA NON PROXY INTEGRATION 
+            type                = "aws"
             httpMethod          = "POST"
             uri                 = "arn:aws:apigateway:${var.region}:events:action/PutEvents"
             credentials         = aws_iam_role.address_api_role.arn
@@ -129,33 +152,17 @@ resource "aws_api_gateway_rest_api" "address_api" {
             }
             responses = {
               default = {
-                statusCode = "200"
-                responseTemplates = {
-                  "application/json" = "{}"
-                }
+                statusCode        = "200"
+                responseTemplates = { "application/json" = "{}" }
               }
             }
           }
           parameters = [
-            {
-              name   = "Content-Type"
-              in     = "header"
-              schema = { type = "string" }
-            },
-            {
-              name   = "X-Amz-Target"
-              in     = "header"
-              schema = { type = "string" }
-            },
-            {
-              name     = "addressId"
-              in       = "path"
-              required = true
-              schema   = { type = "string" }
-            }
+            { name = "Content-Type", in = "header", schema = { type = "string" } },
+            { name = "X-Amz-Target", in = "header", schema = { type = "string" } },
+            { name = "addressId", in = "path", required = true, schema = { type = "string" } }
           ]
         }
-
         delete = {
           security = [{ CognitoAuthorizer = [] }]
           "x-amazon-apigateway-integration" = {
@@ -182,81 +189,61 @@ resource "aws_api_gateway_rest_api" "address_api" {
             }
             responses = {
               default = {
-                statusCode = "200"
-                responseTemplates = {
-                  "application/json" = "{}"
-                }
+                statusCode        = "200"
+                responseTemplates = { "application/json" = "{}" }
               }
             }
           }
           parameters = [
-            {
-              name   = "Content-Type"
-              in     = "header"
-              schema = { type = "string" }
-            },
-            {
-              name   = "X-Amz-Target"
-              in     = "header"
-              schema = { type = "string" }
-            },
-            {
-              name     = "addressId"
-              in       = "path"
-              required = true
-              schema   = { type = "string" }
-            }
+            { name = "Content-Type", in = "header", schema = { type = "string" } },
+            { name = "X-Amz-Target", in = "header", schema = { type = "string" } },
+            { name = "addressId", in = "path", required = true, schema = { type = "string" } }
           ]
         }
       }
-
       "/favourites" = {
         get = {
           security = [{ CognitoAuthorizer = [] }]
           responses = {
-            "200" = {
-              description = "200 response"
-            }
+            "200" = { description = "200 response" }
           }
           "x-amazon-apigateway-integration" = {
+            type                = "aws_proxy"
             httpMethod          = "POST"
             uri                 = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.list_favourites_function_arn}/invocations"
             passthroughBehavior = "when_no_match"
-            type                = "aws_proxy"
           }
         }
         post = {
+          security = [{ CognitoAuthorizer = [] }]
           parameters = [
-            {
-              name   = "Content-Type"
-              in     = "header"
-              schema = { type = "string" }
-            },
-            {
-              name   = "X-Amz-Target"
-              in     = "header"
-              schema = { type = "string" }
-            }
+            { name = "Content-Type", in = "header", schema = { type = "string" } },
+            { name = "X-Amz-Target", in = "header", schema = { type = "string" } }
           ]
+          requestBody = {
+            required = true
+            content = {
+              "application/json" = {
+                schema = { "$ref" = "#/components/schemas/Empty" }
+              }
+            }
+          }
           responses = {
             "200" = {
               description = "200 response"
               content = {
                 "application/json" = {
-                  schema = {
-                    "$ref" = "#/components/schemas/Empty"
-                  }
+                  schema = { "$ref" = "#/components/schemas/Empty" }
                 }
               }
             }
           }
-          security = [{ CognitoAuthorizer = [] }]
           "x-amazon-apigateway-integration" = {
-            credentials         = aws_iam_role.address_api_role.arn # ta sama rola, mam w niej uprawnienia dla events oraz sqs
-            httpMethod          = "POST"
-            uri                 = "arn:aws:apigateway:${var.region}:sqs:path/${data.aws_caller_identity.current.account_id}/${var.favourites_sqs_queue_name}" # tutaj nalezy podac queue name
-            passthroughBehavior = "never"
             type                = "aws"
+            httpMethod          = "POST"
+            uri                 = "arn:aws:apigateway:${var.region}:sqs:path/${data.aws_caller_identity.current.account_id}/${var.favourites_sqs_queue_name}"
+            credentials         = aws_iam_role.address_api_role.arn
+            passthroughBehavior = "never"
             requestParameters = {
               "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
             }
@@ -270,50 +257,8 @@ resource "aws_api_gateway_rest_api" "address_api" {
                 &MessageAttributes.2.Name=UserId
                 &MessageAttributes.2.Value.StringValue=$context.authorizer.claims.sub
                 &MessageAttributes.2.Value.DataType=String
-                &Version=2012-11-05
               EOF
             }
-          }
-        }
-      }
-
-      "/favourites/{restaurantId}" = {
-        delete = {
-          parameters = [
-            {
-              name   = "Content-Type"
-              in     = "header"
-              schema = { type = "string" }
-            },
-            {
-              name   = "X-Amz-Target"
-              in     = "header"
-              schema = { type = "string" }
-            },
-            {
-              name     = "restaurantId"
-              in       = "path"
-              required = true
-              schema   = { type = "string" }
-            }
-          ]
-          responses = {
-            "200" = {
-              description = "200 response"
-              content = {
-                "application/json" = {
-                  schema = {
-                    "$ref" = "#/components/schemas/Empty"
-                  }
-                }
-              }
-            }
-          }
-          security = [{ CognitoAuthorizer = [] }]
-          "x-amazon-apigateway-integration" = {
-            credentials         = aws_iam_role.address_api_role.arn 
-            httpMethod          = "POST"
-            uri                 = "arn:aws:apigateway:${var.region}:sqs:path/${data.aws_caller_identity.current.account_id}/${var.favourites_sqs_queue_name}" 
             responses = {
               default = {
                 statusCode = "200"
@@ -322,8 +267,43 @@ resource "aws_api_gateway_rest_api" "address_api" {
                 }
               }
             }
+          }
+        }
+      }
+      "/favourites/{favouriteId}" = {
+        delete = {
+          security = [{ CognitoAuthorizer = [] }]
+          parameters = [
+            { name = "favouriteId", in = "path", required = true, schema = { type = "string" } }
+          ]
+          "x-amazon-apigateway-integration" = {
+            type                = "aws"
+            httpMethod          = "POST"
+            uri                 = "arn:aws:apigateway:${var.region}:sqs:path/${data.aws_caller_identity.current.account_id}/${var.favourites_sqs_queue_name}"
+            credentials         = aws_iam_role.address_api_role.arn
+            passthroughBehavior = "never"
             requestParameters = {
               "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
+            }
+            requestTemplates = {
+              "application/json" = <<-EOF
+                Action=SendMessage
+                &MessageBody=$input.params('favouriteId')
+                &MessageAttributes.1.Name=CommandName
+                &MessageAttributes.1.Value.StringValue=RemoveFavorite
+                &MessageAttributes.1.Value.DataType=String
+                &MessageAttributes.2.Name=UserId
+                &MessageAttributes.2.Value.StringValue=$context.authorizer.claims.sub
+                &MessageAttributes.2.Value.DataType=String
+              EOF
+            }
+            responses = {
+              default = {
+                statusCode = "200"
+                responseTemplates = {
+                  "application/json" = "{}"
+                }
+              }
             }
           }
         }
@@ -331,7 +311,6 @@ resource "aws_api_gateway_rest_api" "address_api" {
     }
   })
 }
-
 
 resource "aws_api_gateway_deployment" "address_api_deploy" {
   rest_api_id = aws_api_gateway_rest_api.address_api.id
