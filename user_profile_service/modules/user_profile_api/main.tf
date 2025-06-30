@@ -40,7 +40,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
           x-amazon-apigateway-authtype   = "cognito_user_pools"
           x-amazon-apigateway-authorizer = {
             type         = "cognito_user_pools"
-            providerARNs = ["arn:aws:cognito-idp:${var.region}:${data.aws_caller_identity.current.account_id}:userpool/${var.user_pool_id}"]
+            providerARNs = ["arn:aws:cognito-idp:${var.region}:${data.aws_caller_identity.current.account_id}:userpool/${var.cognito_user_pool_id}"]
           }
         }
       }
