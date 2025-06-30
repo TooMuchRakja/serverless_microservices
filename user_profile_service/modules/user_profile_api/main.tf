@@ -270,11 +270,11 @@ resource "aws_api_gateway_rest_api" "address_api" {
           }
         }
       }
-      "/favourites/{favouriteId}" = {
+      "/favourites/{restaurantId}" = {
         delete = {
           security = [{ CognitoAuthorizer = [] }]
           parameters = [
-            { name = "favouriteId", in = "path", required = true, schema = { type = "string" } }
+            { name = "restaurantId", in = "path", required = true, schema = { type = "string" } }
           ]
           "x-amazon-apigateway-integration" = {
             type                = "aws"
@@ -288,7 +288,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
             requestTemplates = {
               "application/json" = <<-EOF
                 Action=SendMessage
-                &MessageBody=$input.params('favouriteId')
+                &MessageBody=$input.params('restaurantId')
                 &MessageAttributes.1.Name=CommandName
                 &MessageAttributes.1.Value.StringValue=RemoveFavorite
                 &MessageAttributes.1.Value.DataType=String

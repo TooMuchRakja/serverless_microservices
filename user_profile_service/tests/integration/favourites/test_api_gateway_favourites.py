@@ -11,14 +11,14 @@ user1_new_favorite = {"restaurantId": str(uuid.uuid4())}
 user2_new_favorite = {"restaurantId": str(uuid.uuid4())}
 
 def test_access_to_the_favorites_without_authentication(global_config):
-    response = requests.get(global_config["address_api_endpoint_url"] + '/favorite')
+    response = requests.get(global_config["address_api_endpoint_url"] + '/favourites')
     assert response.status_code == 401  
 
 def test_add_user_favorite(global_config):
     # LOGGER.info("ID token: %s", global_config["user1UserIdToken"])
     # LOGGER.info("Endpoint: %s", global_config["address_api_endpoint_url"])
     response = requests.post(
-        global_config["address_api_endpoint_url"] + '/favorites',
+        global_config["address_api_endpoint_url"] + '/favourites',
         data=json.dumps(user1_new_favorite),
         headers={'Authorization': global_config["user1UserIdToken"], 
             'Content-Type': 'application/json'}
@@ -30,7 +30,7 @@ def test_add_user_favorite(global_config):
     time.sleep(1)
 
     response = requests.get(
-        global_config["address_api_endpoint_url"] + '/favorites',
+        global_config["address_api_endpoint_url"] + '/favourites',
         headers={'Authorization': global_config["user1UserIdToken"], 
             'Content-Type': 'application/json'}
     )
@@ -43,7 +43,7 @@ def test_add_user_favorite(global_config):
 
 def test_delete_user_favorite(global_config):
     response = requests.post(
-        global_config["address_api_endpoint_url"] + '/favorites',
+        global_config["address_api_endpoint_url"] + '/favourites',
         data=json.dumps(user1_new_favorite),
         headers={'Authorization': global_config["user1UserIdToken"], 
             'Content-Type': 'application/json'}
@@ -54,7 +54,7 @@ def test_delete_user_favorite(global_config):
     time.sleep(1)
 
     response = requests.delete(
-        global_config["address_api_endpoint_url"] + '/favorites/' + user1_new_favorite['restaurantId'],
+        global_config["address_api_endpoint_url"] + '/favourites/' + user1_new_favorite['restaurantId'],
         headers={'Authorization': global_config["user1UserIdToken"], 
             'Content-Type': 'application/json'}        
     )
@@ -64,7 +64,7 @@ def test_delete_user_favorite(global_config):
     time.sleep(1)    
 
     response = requests.get(
-        global_config["address_api_endpoint_url"] + '/favorites',
+        global_config["address_api_endpoint_url"] + '/favourites',
         headers={'Authorization': global_config["user1UserIdToken"], 
             'Content-Type': 'application/json'}
     )
