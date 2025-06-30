@@ -52,3 +52,7 @@ output "Address_Table" {
 output "address_api_endpoint_url" {
     value = module.user_profile_service.address_api_endpoint_url
 }
+
+output "Favourites_Table" {
+    value = module.user_profile_service.favourites_table_name
+}

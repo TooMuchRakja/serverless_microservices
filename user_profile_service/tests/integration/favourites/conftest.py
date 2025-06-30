@@ -93,13 +93,13 @@ def clear_dynamo_tables():
     # clear all data from the tables that will be used for testing
     dbd_client = boto3.client('dynamodb')
     db_response = dbd_client.scan(
-        TableName=globalConfig['Address_Table'],
-        AttributesToGet=['user_id', 'address_id']
+        TableName=globalConfig['Favourites_Table'],
+        AttributesToGet=['user_id', 'restaurant_id']
     )
     for item in db_response["Items"]:
         dbd_client.delete_item(
-            TableName=globalConfig['Address_Table'],
-            Key={'user_id': {'S': item['user_id']["S"]}, 'address_id': {'S': item['address_id']["S"]}}
+            TableName=globalConfig['Favourites_Table'],
+            Key={'user_id': {'S': item['user_id']["S"]}, 'restaurant_id': {'S': item['restaurant_id']["S"]}}
         )
     return
 
