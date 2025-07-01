@@ -27,7 +27,7 @@ def test_add_user_favorite(global_config):
     assert response.status_code == 200  
 
     # ensure the async request in the queue has time to be processed
-    time.sleep(1)
+    time.sleep(3)
 
     response = requests.get(
         global_config["address_api_endpoint_url"] + '/favourites',
