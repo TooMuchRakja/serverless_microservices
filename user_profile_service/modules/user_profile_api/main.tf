@@ -257,6 +257,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
                 &MessageAttributes.2.Name=UserId
                 &MessageAttributes.2.Value.StringValue=$context.authorizer.claims.sub
                 &MessageAttributes.2.Value.DataType=String
+                &Version=2012-11-05
               EOF
             }
             responses = {
