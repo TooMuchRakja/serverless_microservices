@@ -38,3 +38,7 @@ variable "list_favourites_function_name" {
   type = string
 }
 
+variable "favourites_sqs_queue_name" {
+  type = string
+}
+

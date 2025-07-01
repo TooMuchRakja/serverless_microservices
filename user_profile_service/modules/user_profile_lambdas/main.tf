@@ -109,3 +109,4 @@ resource "aws_lambda_function" "list_address_function" {
     Environment = "${var.environment}"
   }
 }
+

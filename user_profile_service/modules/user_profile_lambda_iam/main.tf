@@ -306,10 +306,25 @@ resource "aws_iam_policy" "add_favourites_function_policy" {
         "dynamodb:PutItem",
         "dynamodb:GetItem",
         "dynamodb:DescribeTable",
-        "dynamodb:ConditionCheckItem"
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:Query"
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.favourites_dynamodb_table_name}"
+    },
+    {
+      "Action": [
+        "sqs:GetQueueAttributes",
+        "sqs:ReceiveMessage",
+        "sqs:SendMessage",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueUrl",
+        "sqs:SetQueueAttributes  
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:sqs:${var.region}:${data.aws_caller_identity.current.account_id}:${var.favourites_sqs_queue_name}"
     },
     {
       "Action": [

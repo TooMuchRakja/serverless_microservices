@@ -50,6 +50,9 @@ variable "stack_name" {
     type = string
 }
 
+variable "favourites_sqs_queue_arn" {
+  type = string
+}
 
 
 

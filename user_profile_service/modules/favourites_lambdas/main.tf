@@ -58,3 +58,10 @@ resource "aws_lambda_function" "list_favourites_function" {
     Environment = "${var.environment}"
   }
 }
+
+resource "aws_lambda_event_source_mapping" "sqs_add_favourites_lambda_trigger" {
+  event_source_arn = var.favourites_sqs_queue_arn
+  function_name    = aws_lambda_function.add_favourites_function.arn
+  batch_size       = 10
+  enabled          = true
+}

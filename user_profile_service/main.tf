@@ -49,6 +49,7 @@ module "user_profile_lambda_iam" {
   favourites_dynamodb_table_name = module.favourites_dynamodb.favourites_dynamodb_table_name
   add_favourites_function_name = var.add_favourites_function_name
   list_favourites_function_name = var.list_favourites_function_name
+  favourites_sqs_queue_name = module.favourites_sqs.favourites_sqs_queue_name
 }
 
 module "user_profile_api"  {
@@ -87,6 +88,7 @@ module "favourites_lambdas" {
   list_favourites_function_name = var.list_favourites_function_name
   add_favourites_role_arn = module.user_profile_lambda_iam.add_favourites_role_arn
   list_favourites_role_arn = module.user_profile_lambda_iam.list_favourites_role_arn
+  favourites_sqs_queue_arn = module.favourites_sqs.favourites_sqs_queue_arn
 }
 
 

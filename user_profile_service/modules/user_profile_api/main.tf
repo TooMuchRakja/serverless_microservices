@@ -381,7 +381,8 @@ resource "aws_iam_policy" "address_api_role_policy" {
         Sid = "AllowSendMessageToFavouritesQueue"
         Effect = "Allow"
         Action = [ 
-          "sqs:SendMessage"
+          "sqs:SendMessage",
+          "sqs":"GetQueueAttributes"
         ]
         Resource = "${var.favourites_sqs_queue_arn}"
       }
@@ -401,3 +402,14 @@ resource "aws_lambda_permission" "list_favourites_permission" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.address_api.execution_arn}/prod/GET/favourites"
 }
+
+#poniżej wywołanie musi być dla sqs i source arn to arn kolejki a nie api - wtedy się to logicznie nie zgra 
+resource "aws_lambda_permission" "sqs_queue_lambda_permission" {
+  statement_id  = "AllowSQSToInvokeLambda"
+  action        = "lambda:InvokeFunction"
+  function_name = var.add_favourites_function_name
+  principal     = "sqs.amazonaws.com"
+  source_arn    = var.favourites_sqs_queue_arn
+}
+
+
