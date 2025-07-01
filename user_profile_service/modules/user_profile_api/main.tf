@@ -382,7 +382,7 @@ resource "aws_iam_policy" "address_api_role_policy" {
         Effect = "Allow"
         Action = [ 
           "sqs:SendMessage",
-          "sqs":"GetQueueAttributes"
+          "sqs:GetQueueAttributes"
         ]
         Resource = "${var.favourites_sqs_queue_arn}"
       }
