@@ -321,7 +321,7 @@ resource "aws_iam_policy" "add_favourites_function_policy" {
         "sqs:SendMessage",
         "sqs:DeleteMessage",
         "sqs:GetQueueUrl",
-        "sqs:SetQueueAttributes  
+        "sqs:SetQueueAttributes"  
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:sqs:${var.region}:${data.aws_caller_identity.current.account_id}:${var.favourites_sqs_queue_name}"
