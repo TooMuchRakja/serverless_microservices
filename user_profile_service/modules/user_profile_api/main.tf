@@ -277,7 +277,7 @@ resource "aws_api_gateway_rest_api" "address_api" {
               "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
             }
             requestTemplates = {
-              "application/json" = "application/json" = "Action=SendMessage&MessageBody=$input.params().get('path').get('restaurantId')&MessageAttributes.1.Name=CommandName&MessageAttributes.1.Value.StringValue=DeleteFavorite&MessageAttributes.1.Value.DataType=String&MessageAttributes.2.Name=UserId&MessageAttributes.2.Value.StringValue=$context.authorizer.claims.sub&MessageAttributes.2.Value.DataType=String&Version=2012-11-05"
+              "application/json" = "Action=SendMessage&MessageBody=$input.params().get('path').get('restaurantId')&MessageAttributes.1.Name=CommandName&MessageAttributes.1.Value.StringValue=DeleteFavorite&MessageAttributes.1.Value.DataType=String&MessageAttributes.2.Name=UserId&MessageAttributes.2.Value.StringValue=$context.authorizer.claims.sub&MessageAttributes.2.Value.DataType=String&Version=2012-11-05"
 
             }
             responses = {
