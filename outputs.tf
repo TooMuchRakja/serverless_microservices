@@ -58,5 +58,5 @@ output "Favourites_Table" {
 }
 
 output "Pooling_Bus_Name" {
-    value = module.user_profile_service.Pooling_Bus_Name
+    value = module.pooling_service.Pooling_Bus_Name
 }
