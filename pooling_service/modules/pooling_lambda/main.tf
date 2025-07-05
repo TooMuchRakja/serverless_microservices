@@ -13,7 +13,7 @@ resource "aws_lambda_function" "update_pooling_function" {
     
   function_name = "${var.update_pooling_function_name}"
   description   = "Pooling Lambda function to update orders from DynamoDB orders table "
-  role          = var.add_favourites_role_arn # do zmiany 
+  role          = aws_iam_role.update_pooling_function_role.arn
   handler       = "lambda_function.lambda_handler"
   runtime       = var.lambda_runtime
   memory_size   = var.lambda_memory
