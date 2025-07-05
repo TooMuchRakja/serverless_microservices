@@ -18,10 +18,6 @@ variable "python_version" {
   default = "python310"
 }
 
-variable "region" {
-  type    = string
-}
-
 variable "update_pooling_function_name" {
   type = string
 }
