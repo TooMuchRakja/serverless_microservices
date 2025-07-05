@@ -291,7 +291,7 @@ jobs:
       - name: Run Integration Tests for pooling
         run: |
           source test_pooling/bin/activate
-          PYTHONPATH=pooling_service/src/api -m pytest pooling_service/tests/integration -v
+          PYTHONPATH=pooling_service/src/api python -m pytest pooling_service/tests/integration -v
         shell: bash
 
 # Rollback procedure in case of failure 
