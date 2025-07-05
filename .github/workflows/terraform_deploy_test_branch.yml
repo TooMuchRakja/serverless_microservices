@@ -101,7 +101,7 @@ jobs:
             type: simple
             entry: lambda_function.py
 
-          - name: add_pooling_function
+          - name: update_pooling_function
             path: ./pooling_service/src/api
             type: simple
             entry: lambda_function.py
