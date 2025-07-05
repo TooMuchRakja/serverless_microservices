@@ -56,3 +56,7 @@ output "address_api_endpoint_url" {
 output "Favourites_Table" {
     value = module.user_profile_service.favourites_table_name
 }
+
+output "Pooling_Bus_Name" {
+    value = module.user_profile_service.Pooling_Bus_Name
+}

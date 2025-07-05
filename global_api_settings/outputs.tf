@@ -17,3 +17,7 @@ output "aws_api_gateway_account_settings" {
 output "address_api_access_logs_arn" {
   value = aws_cloudwatch_log_group.address_api_access_logs.arn
 }
+
+output "pooling_api_access_logs_arn" {
+  value = aws_cloudwatch_log_group.pooling_api_access_logs.arn
+}

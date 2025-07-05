@@ -89,7 +89,7 @@ resource "aws_lambda_function" "list_address_function" {
   function_name = "${var.list_address_function_name}"
   description   = "Lambda function which returns addresses from dynamodb address table"
   role          =  var.list_address_role_arn
-  handler       = "lambda_function.lambda_handler"
+  handler       = "lambda_function.lambda_handler" #nazwa pliku funkcji + nazwa handlera 
   runtime       = var.lambda_runtime
   memory_size   = var.lambda_memory
   timeout       = var.lambda_timeout
