@@ -281,7 +281,7 @@ jobs:
     #    shell: bash
 
 
-    # - name: Set up test environment for pooling service 
+      - name: Set up test environment for pooling service 
         run: |
           python -m venv test_pooling
           source test_pooling/bin/activate
