@@ -26,6 +26,10 @@ variable "update_pooling_function_name" {
   type = string
 }
 
+variable "region" {
+    type = string
+}
+
 variable "environment" {
   type = string
 }
