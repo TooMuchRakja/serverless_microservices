@@ -21,7 +21,7 @@ def get_stack_outputs():
     return result
 
 def load_test_order():
-    with open('tests/integration/order.json') as f:
+    with open('pooling_service/tests/integration/order.json') as f:
         test_order = json.load(f)
     test_order['data']['userId'] = globalConfig['regularUserSub']
 
