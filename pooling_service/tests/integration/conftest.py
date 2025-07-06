@@ -122,7 +122,7 @@ def seed_dynamo_tables():
 @pytest.fixture(scope='session')
 def global_config(request):
     global globalConfig
-    globalConfig.update(get_terraform_outputs()) # tutaj outputy z terraforma dodawane są do słownika globla config
+    globalConfig.update(get_stack_outputs()) # tutaj outputy z terraforma dodawane są do słownika globla config
     globalConfig.update(create_cognito_accounts())
     globalConfig['order'] = load_test_order()
     seed_dynamo_tables()

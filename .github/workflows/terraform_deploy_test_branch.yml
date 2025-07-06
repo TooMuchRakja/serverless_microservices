@@ -38,68 +38,68 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: userfunction
-            path: ./users/src/users
-            type: python
-            entry: lambda_function.py
-          - name: authorizer_function
-            path: ./users/src/authorizer
-            type: python
-            entry: lambda_function.py
+        #  - name: userfunction
+        #    path: ./users/src/users
+        #    type: python
+        #    entry: lambda_function.py
+        #  - name: authorizer_function
+        #    path: ./users/src/authorizer
+        #    type: python
+        #    entry: lambda_function.py
 
-          - name: requirements_layer
-            path: ./orders/src/layers/requirements_layer
-            type: layer_requirements
-          - name: get_order_layer
-            path: ./orders/src/layers/get_function_layer
-            type: layer_simple
+        #  - name: requirements_layer
+        #    path: ./orders/src/layers/requirements_layer
+        #    type: layer_requirements
+        #  - name: get_order_layer
+        #    path: ./orders/src/layers/get_function_layer
+        #    type: layer_simple
 
-          - name: add_order_function
-            path: ./orders/src/lambda_functions/add_order
-            type: simple
-            entry: lambda_function.py
-          - name: delete_order_function
-            path: ./orders/src/lambda_functions/delete_order
-            type: simple
-            entry: lambda_function.py
-          - name: edit_order_function
-            path: ./orders/src/lambda_functions/edit_order
-            type: simple
-            entry: lambda_function.py
-          - name: get_order_function
-            path: ./orders/src/lambda_functions/get_order
-            type: simple
-            entry: lambda_function.py
-          - name: list_order_function
-            path: ./orders/src/lambda_functions/list_order
-            type: simple
-            entry: lambda_function.py
+        #  - name: add_order_function
+        #    path: ./orders/src/lambda_functions/add_order
+        #    type: simple
+        #    entry: lambda_function.py
+        #  - name: delete_order_function
+        #    path: ./orders/src/lambda_functions/delete_order
+        #    type: simple
+        #    entry: lambda_function.py
+        #  - name: edit_order_function
+        #    path: ./orders/src/lambda_functions/edit_order
+        #    type: simple
+        #    entry: lambda_function.py
+        #  - name: get_order_function
+        #    path: ./orders/src/lambda_functions/get_order
+        #    type: simple
+        #    entry: lambda_function.py
+        #  - name: list_order_function
+        #    path: ./orders/src/lambda_functions/list_order
+        #    type: simple
+        #    entry: lambda_function.py
 
-          - name: add_address_function
-            path: ./user_profile_service/src/lambda_functions_address/add_address_function
-            type: simple
-            entry: lambda_function.py
-          - name: edit_address_function
-            path: ./user_profile_service/src/lambda_functions_address/edit_address_function
-            type: simple
-            entry: lambda_function.py
-          - name: delete_address_function
-            path: ./user_profile_service/src/lambda_functions_address/delete_address_function
-            type: simple
-            entry: lambda_function.py
-          - name: list_address_function
-            path: ./user_profile_service/src/lambda_functions_address/list_address_function
-            type: simple
-            entry: lambda_function.py
+        #  - name: add_address_function
+        #    path: ./user_profile_service/src/lambda_functions_address/add_address_function
+        #    type: simple
+        #    entry: lambda_function.py
+        #  - name: edit_address_function
+        #    path: ./user_profile_service/src/lambda_functions_address/edit_address_function
+        #    type: simple
+        #    entry: lambda_function.py
+        #  - name: delete_address_function
+        #    path: ./user_profile_service/src/lambda_functions_address/delete_address_function
+        #    type: simple
+        #    entry: lambda_function.py
+        #  - name: list_address_function
+        #    path: ./user_profile_service/src/lambda_functions_address/list_address_function
+        #    type: simple
+        #    entry: lambda_function.py
 
-          - name: list_favourites_function
-            path: ./user_profile_service/src/lambda_functions_favourites/list_favourites_function
-            type: simple
-            entry: lambda_function.py
-          - name: add_favourites_function
-            path: ./user_profile_service/src/lambda_functions_favourites/add_favourites_function
-            type: simple
-            entry: lambda_function.py
+        #  - name: list_favourites_function
+        #    path: ./user_profile_service/src/lambda_functions_favourites/list_favourites_function
+        #    type: simple
+        #    entry: lambda_function.py
+        #  - name: add_favourites_function
+        #    path: ./user_profile_service/src/lambda_functions_favourites/add_favourites_function
+        #    type: simple
+        #    entry: lambda_function.py
 
           - name: update_pooling_function
             path: ./pooling_service/src/api
