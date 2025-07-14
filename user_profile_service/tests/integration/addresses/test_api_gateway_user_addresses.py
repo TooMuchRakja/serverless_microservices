@@ -4,6 +4,7 @@ import logging
 import time
 import uuid
 import copy
+import time 
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +23,8 @@ def test_add_user_address_with_invalid_fields(global_config):
     ) 
     assert response.status_code == 500
    
+import time  # ← to wystarczy, NIE dodajesz tego do requirements.txt
+
 def test_add_user_address(global_config):
     # Add an address
     requests.post(
@@ -33,6 +36,9 @@ def test_add_user_address(global_config):
         }
     )
 
+    # Waiting for data to save
+    time.sleep(2)
+
     # Check the number of addresses
     check_response = requests.get(
         global_config["address_api_endpoint_url"] + '/address',
@@ -43,6 +49,7 @@ def test_add_user_address(global_config):
     )
     addresses = json.loads(check_response.text).get("addresses", [])
     assert len(addresses) == 1, f"Expected 1 address, found {len(addresses)}"
+
 
 def test_update_user_address(global_config):
     # Get the address to update
@@ -111,6 +118,10 @@ def test_delete_user_address(global_config):
             'Content-Type': 'application/json'
         }
     )
+
+    # Waiting for data to save
+    time.sleep(2)
+
 
     # Verify that the address list is now empty
     verify_response = requests.get(
