@@ -32,12 +32,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 # lambda packages (builds) - replace matrix with your names and paths aas required            
-  package_lambda:
-    runs-on: ubuntu-latest
-    needs: initialize_env
-    strategy:
-      matrix:
-        include:
+ # package_lambda:
+  #  runs-on: ubuntu-latest
+   # needs: initialize_env
+    #strategy:
+     # matrix:
+      #  include:
         #  - name: userfunction
         #    path: ./users/src/users
         #    type: python
