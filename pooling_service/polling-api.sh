@@ -2,7 +2,7 @@
 url=$1
 TOKEN=$2
 AUTH_HEADER="Authorization:$TOKEN"
-interval_in_seconds=2
+interval_in_seconds=10
 result="IN-PROCESS"
 printf "\nPolling '$url' every $interval_in_seconds seconds, until '$result'\n"
 while true; 

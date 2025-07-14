@@ -1,9 +1,9 @@
-name: Terraform Deployment - test branch modules 2,3 and 4 
+name: Terraform Deployment - test branch modules 2,3,4 and 5  
 
 on:
   push:
     branches:
-      - test
+      - main
 
 env:
   S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
@@ -31,7 +31,7 @@ jobs:
           aws-region: ${{ env.TF_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-# package lambda poprawne i sprawdzone ##
+# lambda packages (builds) - replace matrix with your names and paths aas required            
   package_lambda:
     runs-on: ubuntu-latest
     needs: initialize_env
@@ -101,10 +101,10 @@ jobs:
         #    type: simple
         #    entry: lambda_function.py
 
-          - name: update_pooling_function
-            path: ./pooling_service/src/api
-            type: simple
-            entry: lambda_function.py
+        #  - name: update_pooling_function
+        #    path: ./pooling_service/src/api
+        #    type: simple
+        #    entry: lambda_function.py
 
 
     steps:
@@ -209,78 +209,79 @@ jobs:
         run: terraform plan -out=tfplan
         working-directory: .
 
-  # Odkomentuj gdy będziesz gotowy do faktycznego deployu
+  # Uncomment when ready to deploy 
       - name: Terraform Apply
         id: apply
         run: terraform apply -auto-approve tfplan
         working-directory: .
 
-
-
       - name: Wait for resources to establish connections
-        run: sleep 10
+        run: sleep 5
+# Uncomment tests when ready to deploy (when tested comment to make workflow shorter)
 
-    # ---- Testy modułu użytkowników ----
-    #  - name: Set up test environment for users module
-    #    run: |
-    #      python -m venv test
-    #      source test/bin/activate
-    #      pip install -r users/tests/requirements.txt
-    #    shell: bash
+#---- Users module tests (module 2) ----
+      - name: Set up test environment for users module
+        run: |
+          python -m venv test
+          source test/bin/activate
+          pip install -r users/tests/requirements.txt
+        shell: bash
 
-    #  - name: Run Unit Tests for users module
-    #    run: |
-    #      source test/bin/activate
-    #      PYTHONPATH=users/src python3 -m pytest users/tests/unit -v
-    #    shell: bash
+      - name: Run Unit Tests for users module
+        run: |
+          source test/bin/activate
+          PYTHONPATH=users/src python3 -m pytest users/tests/unit -v
+        shell: bash
+    
+#---- Integration tests for users (module 2) ----
+      - name: Run Integration Tests for users module
+        run: |
+          source test/bin/activate
+          PYTHONPATH=users/src python3 -m pytest users/tests/integration -v
+        shell: bash
 
-    #  - name: Run Integration Tests for users module
-    #    run: |
-    #      source test/bin/activate
-    #      PYTHONPATH=users/src python3 -m pytest users/tests/integration -v
-    #    shell: bash
-# odkomentuje jak zdebuguje testy dla integration 
-    #  - name: Set up test environment for orders module
-    #    run: |
-    #      python -m venv test_orders
-    #      source test_orders/bin/activate
-    #      pip install -r orders/tests/requirements.txt
-    #    shell: bash
+#---- Integration tests for orders (module 3) ----
+      - name: Set up test environment for orders module
+        run: |
+          python -m venv test_orders
+          source test_orders/bin/activate
+          pip install -r orders/tests/requirements.txt
+        shell: bash
 
-    #  - name: Run Integration Tests for orders module
-    #    run: |
-    #      source test_orders/bin/activate
-    #      PYTHONPATH=orders/src python3 -m pytest orders/tests/integration -v
-    #    shell: bash
+      - name: Run Integration Tests for orders module
+        run: |
+          source test_orders/bin/activate
+          PYTHONPATH=orders/src python3 -m pytest orders/tests/integration -v
+        shell: bash
 
+#---- Integration tests for user profile address (module 4) ----
+      - name: Set up test environment for user profile address module
+        run: |
+          python -m venv test_address
+          source test_address/bin/activate
+          pip install -r user_profile_service/tests/requirements.txt
+        shell: bash
 
-    # - name: Set up test environment for user profile address module
-    #    run: |
-    #      python -m venv test_address
-    #      source test_address/bin/activate
-    #      pip install -r user_profile_service/tests/requirements.txt
-    #    shell: bash
+      - name: Run Integration Tests  user profile address module
+        run: |
+          source test_address/bin/activate
+          PYTHONPATH=user_profile_service/src/lambda_functions_address python3 -m pytest user_profile_service/tests/integration/addresses -v
+        shell: bash
 
-    #  - name: Run Integration Tests  user profile address module
-    #    run: |
-    #      source test_address/bin/activate
-    #      PYTHONPATH=user_profile_service/src/lambda_functions_address python3 -m pytest user_profile_service/tests/integration/addresses -v
-    #    shell: bash
+      - name: Set up test environment for favourites 
+        run: |
+          python -m venv test_address
+          source test_address/bin/activate
+          pip install -r user_profile_service/tests/requirements.txt
+        shell: bash
 
-    # - name: Set up test environment for favourites 
-    #    run: |
-    #      python -m venv test_address
-    #      source test_address/bin/activate
-    #      pip install -r user_profile_service/tests/requirements.txt
-    #    shell: bash
+      - name: Run Integration Tests for favourites
+        run: |
+          source test_address/bin/activate
+          PYTHONPATH=user_profile_service/src/lambda_functions_favourites python3 -m pytest user_profile_service/tests/integration/favourites -v
+        shell: bash
 
-    #  - name: Run Integration Tests for favourites
-    #    run: |
-    #      source test_address/bin/activate
-    #      PYTHONPATH=user_profile_service/src/lambda_functions_favourites python3 -m pytest user_profile_service/tests/integration/favourites -v
-    #    shell: bash
-
-
+#---- Integration tests pooling service (module 5) ----
       - name: Set up test environment for pooling service 
         run: |
           python -m venv test_pooling

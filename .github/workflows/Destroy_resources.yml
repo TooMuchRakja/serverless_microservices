@@ -1,7 +1,7 @@
 name: destroy
 
 on:
-  workflow_dispatch:  # ręczne wywołanie
+  workflow_dispatch:  # manual
 env:
   S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
   TF_BUCKET_NAME: ${{ secrets.TF_BUCKET_NAME }}
