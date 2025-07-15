@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+
 
 env:
   S3_BUCKET: ${{ secrets.LAMBDA_BUCKET_NAME }}
