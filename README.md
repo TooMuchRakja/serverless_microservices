@@ -67,6 +67,9 @@ Amazon Q
 
 ChatGPT
 
+Project notes / ideas : 
+🔮 Obsidian 
+
 📦 Project Structure
 The repository contains 4 modules (modules 2–5). The first module was basic and deployed manually for bootstrapping and is not included in the repository.
 
