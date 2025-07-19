@@ -56,7 +56,7 @@ pytest – for unit/integration testing
 
 moto – for mocking AWS infrastructure
 
-GitHub Secrets – for sensitive credentials
+GitHub Secrets and AWS Secrets Manager – for sensitive credentials
 
 🧪 Debugging Tools
 Amazon CloudWatch
