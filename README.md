@@ -71,6 +71,57 @@ Project notes / ideas :
 🔮 Obsidian 
 
 📦 Project Structure
+.
+├── global_api_settings/               # Shared API configuration (e.g. gateway settings, throttling)
+│   ├── main.tf
+│   ├── outputs.tf
+│   └── variables.tf
+├── main.tf                            # Root-level Terraform definition
+├── outputs.tf
+├── variables.tf
+│
+├── orders/                            # Order management service
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── variables.tf
+│   ├── modules/                       # Infrastructure modules for the orders service
+│   │   ├── orders_api_iam/           # IAM roles and policies for Orders API
+│   │   ├── orders_apigateway/        # API Gateway configuration
+│   │   ├── orders_dynamodb/          # DynamoDB tables for storing order data
+│   │   ├── orders_lambda/            # Lambda functions for order operations
+│   │   └── orders_lambda_iam/        # IAM permissions for Lambda functions
+│   ├── src/
+│   │   ├── lambda_functions/         # Source code for Lambda functions (CRUD operations)
+│   │   └── layers/                   # Shared layers (e.g. utilities, dependencies)
+│   └── tests/                        # Integration tests for the orders module
+│
+├── pooling_service/                  # Service for processing order-related events (updating status by restaurant) and polling by client
+│   ├── events/                       # Sample test event payloads in JSON
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── variables.tf
+│   ├── polling-api.sh                # Helper script for testing the polling API
+│   ├── modules/                      # EventBridge and Lambda infrastructure modules
+│   ├── src/                          # Lambda function source code for API
+│   └── tests/                        # Integration tests
+│
+├── user_profile_service/             # User profile and favorites management service
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── variables.tf
+│   ├── modules/                      # Modules for DynamoDB, Lambda, API Gateway, EventBridge, etc.
+│   ├── src/                          # Lambda functions for address and favorites management
+│   └── tests/                        # Integration tests for user profile service
+│
+├── users/                            # User account management service
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── variables.tf
+│   ├── modules/                      # Modules for API Gateway, Cognito, Lambda, SQS, SNS, etc.
+│   ├── src/                          # Lambda functions for authorization and user operations
+│   └── tests/                        # Integration and unit tests (including test event data)
+
+
 The repository contains 4 modules (modules 2–5). The first module was basic and deployed manually for bootstrapping and is not included in the repository.
 
 ⚠️ This is a backend-only, infrastructure-focused project — no frontend included.
